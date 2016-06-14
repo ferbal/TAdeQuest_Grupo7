@@ -1,5 +1,0 @@
-package tadp
-
-class Escudo {
-  
-}

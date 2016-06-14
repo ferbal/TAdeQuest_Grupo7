@@ -57,3 +57,17 @@ class Vincha_Bufalo_Agua () extends Item {
     unHeroe.trabajo.stat_principal == "Sin Trabajo"
   }
 }
+
+class Talisman_Maldito () extends Item {  
+  
+  ubicacion = Posicion.CABEZA  
+  
+  def beneficios(unHeroe : Heroe): Stats = {     
+      var st = new Stats (1,1,1,1)            
+     st
+  }  
+  
+  def puede_usar(unHeroe : Heroe) : Boolean = {
+    true
+  }
+}

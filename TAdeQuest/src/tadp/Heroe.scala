@@ -21,15 +21,21 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
   
   def get_hp_actual():Int = {    
     val st : Stats = new Stats
-    inventario map { case (ubi, it) =>  st.incrementar(it.beneficios(this))} //Funciona sin OPTION
     
-    /*for{
-      (ubi,it) <- prueba
-      val item : Item= it.get if !it.isEmpty
-      st.incrementar(item.beneficios()) 
-    } yield (st)*/
+    inventario map { 
+        case (ubi, it) =>  
+            st.incrementar(it.beneficios(this))
+           } 
+    /*
+    for {
+          (u,i) <- inventario 
+                                           
+        } yield (st.incrementar(i.beneficios(this)))
+    */
+    st.incrementar(this.stats)
+    st.incrementar(this.trabajo.stats)
     
-    this.stats.hp + this.trabajo.stats.hp + st.hp;    
+    st.hp    
   }
   
   def utilizar_item (ubicacion: String,item : Item) {
