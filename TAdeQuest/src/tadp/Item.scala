@@ -1,9 +1,10 @@
 package tadp
 
 abstract class Item{
-   var ubicacion: String = _
+   var ubicacion: String = _   
    //ver funcion CAMBIO
    
-   def beneficios () : Stats
+   def beneficios (unHeroe : Heroe) : Stats
+   def puede_usar(unHeroe : Heroe) : Boolean
 }
 
