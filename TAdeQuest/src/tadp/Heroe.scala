@@ -2,7 +2,7 @@ package tadp
 
 class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia: Int = 5){
    
-  var prueba : Map[String,Item] = Map(  Posicion.CABEZA -> new Casco,
+  var inventario : Map[String,Item] = Map(  Posicion.CABEZA -> new Casco,
                                         Posicion.MANO_DER-> new Espada_de_la_vida                                                
                                      )
   
@@ -14,7 +14,7 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
   
   def get_hp_actual():Int = {    
     val st : Stats = new Stats
-    prueba map { case (ubi, it) =>  st.incrementar(it.beneficios())} //Funciona sin OPTION
+    inventario map { case (ubi, it) =>  st.incrementar(it.beneficios())} //Funciona sin OPTION
     
     /*for{
       (ubi,it) <- prueba
