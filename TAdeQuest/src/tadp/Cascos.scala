@@ -4,9 +4,8 @@ class Casco () extends Item{
    
    ubicacion = "Cabeza"   
    
-   def beneficios(sts : Stats ): Stats = {
-     var st = new Stats 
-     st.hp  = sts.hp + 10     
+   def beneficios(): Stats = {
+     var st = new Stats (15,0,0,0)     
      st
    }
 }

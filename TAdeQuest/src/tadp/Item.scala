@@ -1,9 +1,9 @@
 package tadp
 
 abstract class Item{
-   var ubicacion: String = ???
+   var ubicacion: String = _
    //ver funcion CAMBIO
    
-   //def beneficios (stat : Stats) : Stats
+   def beneficios () : Stats
 }
 
