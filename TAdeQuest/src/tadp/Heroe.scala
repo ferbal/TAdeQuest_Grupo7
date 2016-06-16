@@ -2,12 +2,11 @@ package tadp
 
 import com.sun.beans.decoder.TrueElementHandler
 import scala.collection.mutable.Map
+import java.util.HashMap
 
 class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia: Int = 5){
    
-  var inventario : Map[String,Item] = Map(  Posicion.CABEZA -> new Casco,
-                                        Posicion.MANO_DER-> new Espada_de_la_vida                                                
-                                     )
+  var inventario = Map[String,Item]()
   
   var stats: Stats = {
     val st = new Stats(hp,fuerza,velocidad,inteligencia)
@@ -19,7 +18,7 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
     this.trabajo = new Trabajo(habilidad)
   }
   
-  def get_hp_actual():Int = {    
+  def get_stats_actuales():Stats = {    
     val st : Stats = new Stats
     
     inventario map { 
@@ -35,7 +34,7 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
     st.incrementar(this.stats)
     st.incrementar(this.trabajo.stats)
     
-    st.hp    
+    return st    
   }
   
   def utilizar_item (ubicacion: String,item : Item) {
