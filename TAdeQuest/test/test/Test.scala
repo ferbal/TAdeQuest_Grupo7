@@ -4,6 +4,7 @@ import org.junit.Test
 import org.junit.Assert._
 import org.junit.Before
 import tadp.Heroe
+import tadp.Trabajo
 import tadp.Item
 import tadp.Stats
 import tadp.Posicion
@@ -21,6 +22,25 @@ class Tests {
 
 //Cargamos la base de datos de items
   
+  
+    val sin_trabajo = new Trabajo("sin trabajo", "Ninguno", {(st,x)=> st})
+    val guerrero = new Trabajo ("guerrero", "Fuerza", 
+        {(st,x)=>
+          st.incrementar(new Stats(10,15,0,-10))
+          st 
+        })
+      val mago = new Trabajo ("mago", "Inteligencia", 
+        {(st,x)=>
+          st.incrementar(new Stats(0,-20,0,20))
+          st 
+        })
+      val ladron = new Trabajo ("ladron", "Velocidad", 
+        {(st,x)=>
+          st.incrementar(new Stats(-5,0,10,0))
+          st 
+        })
+    
+    
      val Vincha_Bufalo_Agua = new Item(Posicion.CABEZA,
     { (st, x) =>
       if (x.stats.fuerza > x.stats.inteligencia) {
@@ -32,7 +52,7 @@ class Tests {
       }
       st
     },
-    { _.trabajo.stat_principal == "Sin Trabajo" })
+    { _.trabajo.stat_principal == "Ninguno" })
 
   val Palito_Magico = new Item(Posicion.MANO_DER,
     { (st, x) =>
@@ -40,8 +60,8 @@ class Tests {
       st
     },
     { x =>
-      x.trabajo.tipo == Habilidad.MAGO ||
-        (x.trabajo.tipo == Habilidad.LADRON &&
+      x.trabajo.tipo == "mago" ||
+        (x.trabajo.tipo == "ladron" &&
           x.stats.inteligencia > 30)
     })
      
@@ -64,9 +84,9 @@ class Tests {
   
   @Test
   def pruebaOrdenSuperior(): Unit = {
-    val guerrero = new Heroe
-    val ladron = new Heroe
-    val mago = new Heroe
+    val warrior = new Heroe
+    val theif = new Heroe
+    val wizard = new Heroe
 
     val efecto_loco: (Stats, Heroe) => Stats = { (st, x) =>
       st.hp *= 2
@@ -75,44 +95,51 @@ class Tests {
     }
 
     val Casco_Loco = new Item(Posicion.CABEZA, efecto_loco, { x => true })
-    guerrero.utilizar_item(Posicion.CABEZA, Casco_Loco)
-    assertEquals(100, guerrero.stats.hp)
-    assertEquals(200, guerrero.get_stats_actuales().hp)
+    warrior.utilizar_item(Posicion.CABEZA, Casco_Loco)
+    assertEquals(100, warrior.stats.hp)
+    assertEquals(200, warrior.get_stats_actuales().hp)
 
+  }
+  
+  @Test
+  def pruebaDeTrabajos(): Unit = {
+    var warrior = new Heroe
+    warrior.cambiarTrabajoA(guerrero)
+    
   }
 
   @Test
   def pruebaInicial(): Unit = {
 
-    val guerrero = new Heroe
+    val warrior = new Heroe
     val palito = Palito_Magico
-    val ladron = new Heroe
-    val mago = new Heroe
+    val theif = new Heroe
+    val wizard = new Heroe
     val vincha = Vincha_Bufalo_Agua
 
-    guerrero.utilizar_item(Posicion.CABEZA, Casco_Supremo)
-    guerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
-    guerrero.utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
-    guerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    warrior.utilizar_item(Posicion.CABEZA, Casco_Supremo)
+    warrior.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    warrior.utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
+    warrior.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
     //println("HP Base: " + guerrero.stats.hp)
     //println("HP Trabajo: " + guerrero.trabajo.stats.hp)
-    println("HP Actual: " + guerrero.get_stats_actuales.hp)
-    guerrero.definir_trabajo(Habilidad.GUERRERO)
-    println("HP Actual: " + guerrero.get_stats_actuales.hp)
+    println("HP Actual: " + warrior.get_stats_actuales.hp)
+    warrior.cambiarTrabajoA(guerrero)
+    println("HP Actual: " + warrior.get_stats_actuales.hp)
 
-    ladron.definir_trabajo(Habilidad.LADRON)
+    theif.cambiarTrabajoA(ladron)
 
-    assertEquals(false, vincha.puede_usar(ladron))
+    assertEquals(false, vincha.puede_usar(theif))
 
-    ladron.definir_trabajo(Habilidad.SIN_TRABAJO)
+    theif.cambiarTrabajoA(sin_trabajo)
 
-    assertEquals(true, vincha.puede_usar(ladron))
+    assertEquals(true, vincha.puede_usar(theif))
 
-    mago.definir_trabajo(Habilidad.MAGO)
+    wizard.cambiarTrabajoA(mago)
 
-    assertEquals(false, palito.puede_usar(ladron))
-    assertEquals(true, palito.puede_usar(mago))
-    assertEquals(false, guerrero.validar_ubicacion(Posicion.MANO_DER, Espada_Zurda))
+    assertEquals(false, palito.puede_usar(theif))
+    assertEquals(true, palito.puede_usar(wizard))
+    assertEquals(false, warrior.validar_ubicacion(Posicion.MANO_DER, Espada_Zurda))
     //assertEquals(350, guerrero.get_hp_actual)
   }
 }
