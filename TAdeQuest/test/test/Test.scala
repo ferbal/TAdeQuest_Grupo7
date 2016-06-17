@@ -22,8 +22,7 @@ class Tests {
 //Cargamos la base de datos de items
   
      val Vincha_Bufalo_Agua = new Item(Posicion.CABEZA,
-    { x =>
-      var st = new Stats
+    { (st, x) =>
       if (x.stats.fuerza > x.stats.inteligencia) {
         st.inteligencia += 30
       } else {
@@ -36,8 +35,8 @@ class Tests {
     { _.trabajo.stat_principal == "Sin Trabajo" })
 
   val Palito_Magico = new Item(Posicion.MANO_DER,
-    { x =>
-      var st = new Stats(0, 0, 0, 20)
+    { (st, x) =>
+      st.incrementar(new Stats(0, 0, 0, 20))
       st
     },
     { x =>
@@ -47,17 +46,17 @@ class Tests {
     })
      
   val Casco_Supremo = new Item(Posicion.CABEZA,
-      {x => var st = new Stats (x.stats.hp + 100,0,0,0)     
+      {(st, x) => st.incrementar(new Stats (x.stats.hp + 100,0,0,0))     
      st},
      {x => true})
      
   val Espada_Doble = new Item(Posicion.AMBAS_MANOS,
-      {x=>var st = new Stats (50,0,0,0)     
+      {(st, x)=> st.incrementar(new Stats (50,0,0,0))     
      st},
      {x=>true})
   
   val Espada_Zurda = new Item(Posicion.MANO_IZQ,
-      {x=>var st = new Stats (200,0,0,0)     
+      {(st, x)=> st.incrementar(new Stats (200,0,0,0))     
      st
    },
    {x=>true})
@@ -69,8 +68,7 @@ class Tests {
     val ladron = new Heroe
     val mago = new Heroe
 
-    val efecto_loco: Heroe => Stats = { x =>
-      val st = x.stats
+    val efecto_loco: (Stats, Heroe) => Stats = { (st, x) =>
       st.hp *= 2
       st.fuerza += 5
       return st

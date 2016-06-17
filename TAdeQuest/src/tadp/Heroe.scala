@@ -8,6 +8,8 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
    
   var inventario = Map[String,Item]()
   
+  var talismanes = List[Item]()
+  
   var stats: Stats = {
     val st = new Stats(hp,fuerza,velocidad,inteligencia)
     st
@@ -19,20 +21,23 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
   }
   
   def get_stats_actuales():Stats = {    
-    val st : Stats = new Stats
+    var st : Stats = this.stats
     
+    /*
     inventario map { 
         case (ubi, it) =>  
             st.incrementar(it.beneficios(this))
            } 
-    /*
     for {
           (u,i) <- inventario 
                                            
         } yield (st.incrementar(i.beneficios(this)))
     */
-    st.incrementar(this.stats)
     st.incrementar(this.trabajo.stats)
+    
+    val itemsTotales = inventario.values ++ talismanes
+    
+    itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}
     
     return st    
   }
