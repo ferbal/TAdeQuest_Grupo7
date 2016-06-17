@@ -2,12 +2,13 @@ package tadp
 
 import com.sun.beans.decoder.TrueElementHandler
 import scala.collection.mutable.Map
+import java.util.HashMap
 
 class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia: Int = 5){
    
-  var inventario : Map[String,Item] = Map(  Posicion.CABEZA -> new Casco,
-                                        Posicion.MANO_DER-> new Espada_de_la_vida                                                
-                                     )
+  var inventario = Map[String,Item]()
+  
+  var talismanes = List[Item]()
   
   var stats: Stats = {
     val st = new Stats(hp,fuerza,velocidad,inteligencia)
@@ -19,23 +20,26 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
     this.trabajo = new Trabajo(habilidad)
   }
   
-  def get_hp_actual():Int = {    
-    val st : Stats = new Stats
+  def get_stats_actuales():Stats = {    
+    var st : Stats = this.stats
     
+    /*
     inventario map { 
         case (ubi, it) =>  
             st.incrementar(it.beneficios(this))
            } 
-    /*
     for {
           (u,i) <- inventario 
                                            
         } yield (st.incrementar(i.beneficios(this)))
     */
-    st.incrementar(this.stats)
     st.incrementar(this.trabajo.stats)
     
-    st.hp    
+    val itemsTotales = inventario.values ++ talismanes
+    
+    itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}
+    
+    return st    
   }
   
   def utilizar_item (ubicacion: String,item : Item) {

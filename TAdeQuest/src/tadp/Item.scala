@@ -1,10 +1,14 @@
 package tadp
 
-abstract class Item{
+class Item (ubicacion: String, efecto: (Stats, Heroe) => Stats, condicion: Heroe=>Boolean) {
    var ubicacion: String = _   
    //ver funcion CAMBIO
    
-   def beneficios (unHeroe : Heroe) : Stats
-   def puede_usar(unHeroe : Heroe) : Boolean
+   def beneficios (unosStats: Stats, unHeroe : Heroe) : Stats ={
+     efecto(unosStats, unHeroe)
+   }
+   def puede_usar(unHeroe : Heroe) : Boolean ={
+     condicion(unHeroe)
+   }
 }
 
