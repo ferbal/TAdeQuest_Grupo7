@@ -15,7 +15,7 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
     val st = new Stats(hp,fuerza,velocidad,inteligencia)
     st
   }
-  var trabajo: Trabajo = new Trabajo("sin trabajo", "Ninguno", {(st,x)=> st})
+  var trabajo: Trabajo = new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})
   
   def cambiarTrabajoA (nuevoTrabajo : Trabajo){
     this.trabajo = nuevoTrabajo

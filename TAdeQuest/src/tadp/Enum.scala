@@ -15,3 +15,12 @@ object Habilidad extends Enumeration {
   val LADRON = "LADRON"
   val SIN_TRABAJO = "SIN TRABAJO"
 }
+
+object Stat_Principal extends Enumeration {
+  val NINGUNO = "NINGUNO"
+  val FUERZA = "FUERZA"
+  val HP = "HP"
+  val VELOCIDAD = "VELOCIDAD"
+  val INTELIGENCIA = "INTELIGENCIA"
+  
+}

@@ -9,23 +9,24 @@ import tadp.Stats
 import tadp.Trabajo
 import tadp.Posicion
 import tadp.Habilidad
+import tadp.Stat_Principal
 
 class Tests {
  
   //Cargamos la base de datos de items
 
-    val sin_trabajo = new Trabajo("sin trabajo", "Ninguno", {(st,x)=> st})
-    val guerrero = new Trabajo ("guerrero", "Fuerza", 
+    val sin_trabajo = new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})
+    val guerrero = new Trabajo (Habilidad.GUERRERO, Stat_Principal.FUERZA, 
         {(st,x)=>
           st.incrementar(new Stats(10,15,0,-10))
           st 
         })
-      val mago = new Trabajo ("mago", "Inteligencia", 
+      val mago = new Trabajo (Habilidad.MAGO, Stat_Principal.INTELIGENCIA, 
         {(st,x)=>
           st.incrementar(new Stats(0,-20,0,20))
           st 
         })
-      val ladron = new Trabajo ("ladron", "Velocidad", 
+      val ladron = new Trabajo (Habilidad.LADRON, Stat_Principal.VELOCIDAD, 
         {(st,x)=>
           st.incrementar(new Stats(-5,0,10,0))
           st 
@@ -41,7 +42,7 @@ class Tests {
                                             st.velocidad += 10
                                           }
                                           st
-                                        },{ _.trabajo.stat_principal == "Ninguno" })
+                                        },{ _.trabajo.stat_principal == Stat_Principal.NINGUNO })
 
   val Palito_Magico = new Item(Posicion.MANO_DER,
     { (st, x) =>
@@ -49,8 +50,8 @@ class Tests {
       st
     },
     { x =>
-      x.trabajo.tipo == "mago" ||
-        (x.trabajo.tipo == "ladron" &&
+      x.trabajo.tipo == Habilidad.MAGO ||
+        (x.trabajo.tipo == Habilidad.LADRON &&
           x.stats.inteligencia > 30)
     })
      
