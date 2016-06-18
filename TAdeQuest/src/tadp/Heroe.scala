@@ -15,10 +15,10 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
     val st = new Stats(hp,fuerza,velocidad,inteligencia)
     st
   }
-  var trabajo: Trabajo = new Trabajo(Habilidad.SIN_TRABAJO)
+  var trabajo: Trabajo = new Trabajo("sin trabajo", "Ninguno", {(st,x)=> st})
   
-  def definir_trabajo (habilidad : String){
-    this.trabajo = new Trabajo(habilidad)
+  def cambiarTrabajoA (nuevoTrabajo : Trabajo){
+    this.trabajo = nuevoTrabajo
   }
   
   def get_stats_actuales():Stats = {    
@@ -33,13 +33,14 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
           (u,i) <- inventario 
                                            
         } yield (st.incrementar(i.beneficios(this)))
-    */
-    st.incrementar(this.trabajo.stats)
+    */        
+    st= trabajo.aplicarModificadorDeStats(st,this)
+    
     st.incrementar(this.stats)
     
     val itemsTotales = inventario.values ++ talismanes
     
-    itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}       
+    itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}
     
     return st    
   }

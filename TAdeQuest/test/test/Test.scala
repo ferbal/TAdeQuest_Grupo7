@@ -6,26 +6,42 @@ import org.junit.Before
 import tadp.Heroe
 import tadp.Item
 import tadp.Stats
+import tadp.Trabajo
 import tadp.Posicion
 import tadp.Habilidad
 
 class Tests {
-
-//Cargamos la base de datos de items
  
-  
+  //Cargamos la base de datos de items
+
+    val sin_trabajo = new Trabajo("sin trabajo", "Ninguno", {(st,x)=> st})
+    val guerrero = new Trabajo ("guerrero", "Fuerza", 
+        {(st,x)=>
+          st.incrementar(new Stats(10,15,0,-10))
+          st 
+        })
+      val mago = new Trabajo ("mago", "Inteligencia", 
+        {(st,x)=>
+          st.incrementar(new Stats(0,-20,0,20))
+          st 
+        })
+      val ladron = new Trabajo ("ladron", "Velocidad", 
+        {(st,x)=>
+          st.incrementar(new Stats(-5,0,10,0))
+          st 
+        })
+        
      val Vincha_Bufalo_Agua = new Item(Posicion.CABEZA,
-    { (stat, unHeroe) =>
-      if (unHeroe.stats.fuerza > unHeroe.stats.inteligencia) {
-        stat.inteligencia += 30
-      } else {
-        stat.fuerza += 10
-        stat.hp += 10
-        stat.velocidad += 10
-      }
-      stat
-    },
-    { _.trabajo.stat_principal == "Sin Trabajo" })
+                                        { (st, x) =>
+                                          if (x.stats.fuerza > x.stats.inteligencia) {
+                                            st.inteligencia += 30
+                                          } else {
+                                            st.fuerza += 10
+                                            st.hp += 10
+                                            st.velocidad += 10
+                                          }
+                                          st
+                                        },{ _.trabajo.stat_principal == "Ninguno" })
 
   val Palito_Magico = new Item(Posicion.MANO_DER,
     { (st, x) =>
@@ -33,8 +49,8 @@ class Tests {
       st
     },
     { x =>
-      x.trabajo.tipo == Habilidad.MAGO ||
-        (x.trabajo.tipo == Habilidad.LADRON &&
+      x.trabajo.tipo == "mago" ||
+        (x.trabajo.tipo == "ladron" &&
           x.stats.inteligencia > 30)
     })
      
@@ -53,66 +69,72 @@ class Tests {
      st
    },
    {x=>true})
-     
   
   @Test
   def pruebaOrdenSuperior(): Unit = {
-    val guerrero = new Heroe
-    val ladron = new Heroe
-    val mago = new Heroe
+    val warrior = new Heroe
+    val theif = new Heroe
+    val wizard = new Heroe
 
     val efecto_loco: (Stats, Heroe) => Stats = { (st, x) =>
       st.hp *= 2
       st.fuerza += 5
       return st
     }
-
+    
     val Casco_Loco = new Item(Posicion.CABEZA, efecto_loco, { x => true })
-    guerrero.utilizar_item(Posicion.CABEZA, Casco_Loco)
-    assertEquals(100, guerrero.stats.hp)
-    assertEquals(200, guerrero.get_stats_actuales().hp)
+    warrior.utilizar_item(Posicion.CABEZA, Casco_Loco)
+    assertEquals(100, warrior.stats.hp)
+    assertEquals(200, warrior.get_stats_actuales().hp)    
 
   }
-
+  
   @Test
   def pruebaInicial(): Unit = {
 
-    val guerrero = new Heroe
-    val palito = Palito_Magico
-    val ladron = new Heroe
-    val mago = new Heroe
-    val vincha = Vincha_Bufalo_Agua
+    val unGuerrero = new Heroe
+    val unPalito = Palito_Magico
+    val unLadron = new Heroe
+    val unMago = new Heroe
+    val unaVincha = Vincha_Bufalo_Agua
 
-    guerrero.utilizar_item(Posicion.CABEZA, Casco_Supremo)
-    guerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
-    guerrero.utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
-    guerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    unGuerrero.utilizar_item(Posicion.CABEZA, Casco_Supremo)
+    unGuerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    //guerrero.utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
+    unGuerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
     //println("HP Base: " + guerrero.stats.hp)
     //println("HP Trabajo: " + guerrero.trabajo.stats.hp)
-    println("HP Actual: " + guerrero.get_stats_actuales.hp)
-    guerrero.definir_trabajo(Habilidad.GUERRERO)
-    println("HP Actual: " + guerrero.get_stats_actuales.hp)
+    println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
+    unGuerrero.cambiarTrabajoA(guerrero)
+    println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
 
-    ladron.definir_trabajo(Habilidad.LADRON)
+    unLadron.cambiarTrabajoA(ladron)
 
-    assertEquals(false, vincha.puede_usar(ladron))
+    assertEquals(false, unaVincha.puede_usar(unLadron))
 
-    ladron.definir_trabajo(Habilidad.SIN_TRABAJO)
+    unLadron.cambiarTrabajoA(sin_trabajo)
 
-    assertEquals(true, vincha.puede_usar(ladron))
+    assertEquals(true, unaVincha.puede_usar(unLadron))
 
-    mago.definir_trabajo(Habilidad.MAGO)
+    unMago.cambiarTrabajoA(mago)
 
-    assertEquals(false, palito.puede_usar(ladron))
-    assertEquals(true, palito.puede_usar(mago))
-    assertEquals(false, guerrero.validar_ubicacion(Posicion.MANO_DER, Espada_Zurda))
+    assertEquals(false, unPalito.puede_usar(unLadron))
+    assertEquals(true, unPalito.puede_usar(unMago))
+    assertEquals(false, unGuerrero.validar_ubicacion(Posicion.MANO_DER, Espada_Zurda))
     
-    assertEquals(560, guerrero.get_stats_actuales().hp)
+    assertEquals(360, unGuerrero.get_stats_actuales().hp)
     
-    guerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
+    unGuerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
     
-    println("HP Actual: " + guerrero.get_stats_actuales.hp)
-    guerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
+    println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
+    unGuerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
+    
+  }
+  
+  @Test
+  def pruebaDeTrabajos(): Unit = {
+    var warrior = new Heroe
+    warrior.cambiarTrabajoA(guerrero)
     
   }
 }
