@@ -7,30 +7,23 @@ import tadp.Heroe
 import tadp.Item
 import tadp.Stats
 import tadp.Posicion
-//import tadp.Casco_Supremo
-//import tadp.Casco
-//import tadp.Espada_Doble
-//import tadp.Espada_Zurda
-//import tadp.Espada_Zurda
-//import tadp.Espada_Doble
-//import tadp.Palito_Magico
 import tadp.Habilidad
-//import tadp.Vincha_Bufalo_Agua
 
 class Tests {
 
 //Cargamos la base de datos de items
+ 
   
      val Vincha_Bufalo_Agua = new Item(Posicion.CABEZA,
-    { (st, x) =>
-      if (x.stats.fuerza > x.stats.inteligencia) {
-        st.inteligencia += 30
+    { (stat, unHeroe) =>
+      if (unHeroe.stats.fuerza > unHeroe.stats.inteligencia) {
+        stat.inteligencia += 30
       } else {
-        st.fuerza += 10
-        st.hp += 10
-        st.velocidad += 10
+        stat.fuerza += 10
+        stat.hp += 10
+        stat.velocidad += 10
       }
-      st
+      stat
     },
     { _.trabajo.stat_principal == "Sin Trabajo" })
 
@@ -113,6 +106,13 @@ class Tests {
     assertEquals(false, palito.puede_usar(ladron))
     assertEquals(true, palito.puede_usar(mago))
     assertEquals(false, guerrero.validar_ubicacion(Posicion.MANO_DER, Espada_Zurda))
-    //assertEquals(350, guerrero.get_hp_actual)
+    
+    assertEquals(560, guerrero.get_stats_actuales().hp)
+    
+    guerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
+    
+    println("HP Actual: " + guerrero.get_stats_actuales.hp)
+    guerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
+    
   }
 }

@@ -1,4 +1,15 @@
-//package tadp
+package tadp
+
+//class Talisman_Minimalismo () extends Item {  
+//  ubicacion = Posicion.TALISMANES  
+//  def beneficios(unHeroe : Heroe): Stats = {
+//     var st = new Stats (50,0,0,0) //-10 hp por cada otro item equipado     
+//     st
+//  }  
+//  def puede_usar(unHeroe : Heroe) : Boolean = {
+//    true
+//  }
+//}
 ////CASCOS
 //class Casco () extends Item{
 //   ubicacion = Posicion.CABEZA   
