@@ -4,35 +4,17 @@ import com.sun.beans.decoder.TrueElementHandler
 import scala.collection.mutable.Map
 import java.util.HashMap
 
-class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia: Int = 5){
-   
-  var inventario = Map[String,Item]()
+case class Heroe (stats: Stats = new Stats(100,20,45,5),
+    inventario: Map[String,Item] = Map[String,Item](), talismanes: List[Item] = List[Item](),
+    trabajo: Trabajo = new Trabajo(Habilidad.SIN_TRABAJO)){   
   
-  var talismanes = List[Item]()
-  
-  var stats: Stats = {
-    val st = new Stats(hp,fuerza,velocidad,inteligencia)
-    st
-  }
-  var trabajo: Trabajo = new Trabajo(Habilidad.SIN_TRABAJO)
-  
-  def definir_trabajo (habilidad : String){
-    this.trabajo = new Trabajo(habilidad)
+  def definir_trabajo (habilidad : String): Heroe ={
+    copy(trabajo= new Trabajo(habilidad))
   }
   
   def get_stats_actuales():Stats = {    
     var st : Stats = this.stats
-    
-    /*
-    inventario map { 
-        case (ubi, it) =>  
-            st.incrementar(it.beneficios(this))
-           } 
-    for {
-          (u,i) <- inventario 
-                                           
-        } yield (st.incrementar(i.beneficios(this)))
-    */
+
     st.incrementar(this.trabajo.stats)
     
     val itemsTotales = inventario.values ++ talismanes
@@ -42,12 +24,25 @@ class Heroe (hp: Int = 100, fuerza: Int = 20, velocidad: Int = 45, inteligencia:
     return st    
   }
   
-  def utilizar_item (ubicacion: String,item : Item) {
+  def get_stat_principal(): Int = {
+    val st = get_stats_actuales()
+    trabajo.stat_principal match{
+      case "Fuerza" => st.fuerza
+      case "Inteligencia" => st.inteligencia
+      case "Velocidad" => st.velocidad
+      case "HP" => st.hp
+      case _ => 0
+    }
+  }
+  
+  def utilizar_item (ubicacion: String,item : Item): Heroe = {
     //Filtro inventario: me quedo con todos los items menos el que voy a usar
-    inventario = for {
+    var invMutable = inventario 
+    invMutable = for {
                         (u,i) <- inventario if !validar_ubicacion(u, item)    
                       } yield (u,i)
-    inventario.update(ubicacion, item)
+    invMutable.update(ubicacion, item)
+    copy(inventario = invMutable)
   }
   
   def validar_ubicacion (ubicacion_actual : String , item_nuevo : Item) : Boolean = {

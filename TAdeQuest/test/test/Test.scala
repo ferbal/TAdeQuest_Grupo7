@@ -64,9 +64,8 @@ class Tests {
   
   @Test
   def pruebaOrdenSuperior(): Unit = {
-    val guerrero = new Heroe
-    val ladron = new Heroe
-    val mago = new Heroe
+    var guerrero = new Heroe
+
 
     val efecto_loco: (Stats, Heroe) => Stats = { (st, x) =>
       st.hp *= 2
@@ -75,7 +74,7 @@ class Tests {
     }
 
     val Casco_Loco = new Item(Posicion.CABEZA, efecto_loco, { x => true })
-    guerrero.utilizar_item(Posicion.CABEZA, Casco_Loco)
+    guerrero = guerrero.utilizar_item(Posicion.CABEZA, Casco_Loco)
     assertEquals(100, guerrero.stats.hp)
     assertEquals(200, guerrero.get_stats_actuales().hp)
 
@@ -84,31 +83,31 @@ class Tests {
   @Test
   def pruebaInicial(): Unit = {
 
-    val guerrero = new Heroe
+    var guerrero = new Heroe
     val palito = Palito_Magico
-    val ladron = new Heroe
-    val mago = new Heroe
+    var ladron = new Heroe
+    var mago = new Heroe
     val vincha = Vincha_Bufalo_Agua
 
-    guerrero.utilizar_item(Posicion.CABEZA, Casco_Supremo)
-    guerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
-    guerrero.utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
-    guerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    guerrero = guerrero.utilizar_item(Posicion.CABEZA, Casco_Supremo)
+    .utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    .utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
+    .utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
     //println("HP Base: " + guerrero.stats.hp)
     //println("HP Trabajo: " + guerrero.trabajo.stats.hp)
     println("HP Actual: " + guerrero.get_stats_actuales.hp)
-    guerrero.definir_trabajo(Habilidad.GUERRERO)
+    guerrero = guerrero.definir_trabajo(Habilidad.GUERRERO)
     println("HP Actual: " + guerrero.get_stats_actuales.hp)
 
-    ladron.definir_trabajo(Habilidad.LADRON)
+    ladron = ladron.definir_trabajo(Habilidad.LADRON)
 
     assertEquals(false, vincha.puede_usar(ladron))
 
-    ladron.definir_trabajo(Habilidad.SIN_TRABAJO)
+    ladron = ladron.definir_trabajo(Habilidad.SIN_TRABAJO)
 
     assertEquals(true, vincha.puede_usar(ladron))
 
-    mago.definir_trabajo(Habilidad.MAGO)
+    mago = mago.definir_trabajo(Habilidad.MAGO)
 
     assertEquals(false, palito.puede_usar(ladron))
     assertEquals(true, palito.puede_usar(mago))
