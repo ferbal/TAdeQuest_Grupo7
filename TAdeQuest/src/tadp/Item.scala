@@ -10,6 +10,6 @@ class Item (ubicacion: String, efecto: (Stats, Heroe) => Stats, condicion: Heroe
    def puede_usar(unHeroe : Heroe) : Boolean ={
      condicion(unHeroe)
    }
-  
+
 }
 

@@ -73,9 +73,9 @@ class Tests {
   
   @Test
   def pruebaOrdenSuperior(): Unit = {
-    val warrior = new Heroe
-    val theif = new Heroe
-    val wizard = new Heroe
+    var warrior = new Heroe
+    var theif = new Heroe
+    var wizard = new Heroe
 
     val efecto_loco: (Stats, Heroe) => Stats = { (st, x) =>
       st.hp *= 2
@@ -84,8 +84,8 @@ class Tests {
     }
     
     val Casco_Loco = new Item(Posicion.CABEZA, efecto_loco, { x => true })
-    warrior.utilizar_item(Posicion.CABEZA, Casco_Loco)
     assertEquals(100, warrior.stats.hp)
+    warrior = warrior.utilizar_item(Posicion.CABEZA, Casco_Loco)
     assertEquals(200, warrior.get_stats_actuales().hp)    
 
   }
@@ -93,31 +93,31 @@ class Tests {
   @Test
   def pruebaInicial(): Unit = {
 
-    val unGuerrero = new Heroe
+    var unGuerrero = new Heroe
     val unPalito = Palito_Magico
-    val unLadron = new Heroe
-    val unMago = new Heroe
+    var unLadron = new Heroe
+    var unMago = new Heroe
     val unaVincha = Vincha_Bufalo_Agua
 
-    unGuerrero.utilizar_item(Posicion.CABEZA, Casco_Supremo)
-    unGuerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    unGuerrero = unGuerrero.utilizar_item(Posicion.CABEZA, Casco_Supremo)
+    .utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
     //guerrero.utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
-    unGuerrero.utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
+    .utilizar_item(Posicion.AMBAS_MANOS, Espada_Doble)
     //println("HP Base: " + guerrero.stats.hp)
     //println("HP Trabajo: " + guerrero.trabajo.stats.hp)
     println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
-    unGuerrero.cambiarTrabajoA(guerrero)
+    unGuerrero = unGuerrero.cambiarTrabajoA(guerrero)
     println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
 
-    unLadron.cambiarTrabajoA(ladron)
+    unLadron = unLadron.cambiarTrabajoA(ladron)
 
     assertEquals(false, unaVincha.puede_usar(unLadron))
 
-    unLadron.cambiarTrabajoA(sin_trabajo)
+    unLadron = unLadron.cambiarTrabajoA(sin_trabajo)
 
     assertEquals(true, unaVincha.puede_usar(unLadron))
 
-    unMago.cambiarTrabajoA(mago)
+    unMago = unMago.cambiarTrabajoA(mago)
 
     assertEquals(false, unPalito.puede_usar(unLadron))
     assertEquals(true, unPalito.puede_usar(unMago))
@@ -125,17 +125,18 @@ class Tests {
     
     assertEquals(360, unGuerrero.get_stats_actuales().hp)
     
-    unGuerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
+    unGuerrero = unGuerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
     
     println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
-    unGuerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
+    unGuerrero = unGuerrero.utilizar_item(Posicion.TALISMANES, Vincha_Bufalo_Agua)
     
   }
   
   @Test
   def pruebaDeTrabajos(): Unit = {
     var warrior = new Heroe
-    warrior.cambiarTrabajoA(guerrero)
+    warrior = warrior.cambiarTrabajoA(guerrero)
     
   }
+
 }
