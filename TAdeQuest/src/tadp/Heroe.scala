@@ -5,7 +5,7 @@ import scala.collection.mutable.Map
 import java.util.HashMap
 import scala.collection.mutable.MutableList
 
-case class Heroe (stats: Stats = new Stats(100,20,45,5),
+case class Heroe (stats: Stats = Stats(100,20,45,5),
     inventario: Map[Posicion,Item] = Map[Posicion,Item](), 
     talismanes: MutableList[Item] = MutableList[Item](),
     trabajo: Option[Trabajo] = None){//new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})){   
@@ -16,7 +16,7 @@ case class Heroe (stats: Stats = new Stats(100,20,45,5),
   }
   
   def get_stats_actuales():Stats = {    
-    var st : Stats = new Stats//this.stats
+    var st : Stats = stats //this.stats
 
     if (trabajo != None)
       st= trabajo.get.aplicarModificadorDeStats(st,this)  
@@ -24,8 +24,7 @@ case class Heroe (stats: Stats = new Stats(100,20,45,5),
     val itemsTotales = inventario.values ++ talismanes
     
     itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}
-    
-    return st    
+  
   }
 
   
