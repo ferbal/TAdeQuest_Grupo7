@@ -1,7 +1,7 @@
 package tadp
 
-class Item (ubicacion: String, efecto: (Stats, Heroe) => Stats, condicion: Heroe=>Boolean) {
-   var ubicacion: String = _   
+class Item (unaUbicacion: Posicion, efecto: (Stats, Heroe) => Stats, condicion: Heroe=>Boolean) {
+   var ubicacion: Posicion = unaUbicacion   
    //var nombre: String = _
    
    def beneficios (unosStats: Stats, unHeroe : Heroe) : Stats ={

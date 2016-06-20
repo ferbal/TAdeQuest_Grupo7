@@ -5,23 +5,29 @@ import scala.util.control.Exception
 case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int, nombre: String) {
 
   def mejorHeroeSegun(f: Heroe => Int): List[Heroe] = {
-    heroes match {
-      case x :: Nil => x::Nil
-      case x :: xs =>
-        val results = heroes.map { x => f(x) }
-        val max = results.reduceLeft(_ max _)
-        heroes.filter { x => f(x) == max }
-      case Nil => Nil
+    try {
+      heroes match {
+        case x :: Nil => x :: Nil
+        case x :: xs =>
+          val results = heroes.map { x => f(x) }
+          val max = results.reduceLeft(_ max _)
+          heroes.filter { x => f(x) == max }
+        case Nil => Nil
+      }
+    } catch {
+      case _ => Nil
     }
   }
 
   def obtenerItem(item: Item): Equipo = {
     mejorHeroeSegun({ x =>
-      val statnuevo = x.utilizar_item(item.ubicacion, item).get_stat_principal
-      statnuevo - x.get_stat_principal
+      var statnuevo = x.utilizar_item(item.ubicacion, item).get_stat_principal
+      statnuevo -= x.get_stat_principal
+      if (statnuevo > 0) { statnuevo }
+      else { throw new Exception("No hay heroe al que le convenga equiparse el item") }
     }) match {
-      case Nil => throw new Exception("No hay heroes aptos para equiparse el item")
-      case x::xs => reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item))
+      case Nil     => this //no hay heroes aptos para equiparse el item, por lo que se descarta
+      case x :: xs => reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item))
     }
   }
 
