@@ -7,6 +7,7 @@ class Taberna {
  def agregarMision(mision:Mision)={
    mision::misiones
  }
+ 
  def mejorMisionSegunCriterio(equipo:Equipo, criterio:(Equipo,Equipo) => Boolean, mision1:Mision, mision2:Mision):Mision={
    if (criterio(mision1.realizarMision(equipo),mision2.realizarMision(equipo))
        {return mision1}
