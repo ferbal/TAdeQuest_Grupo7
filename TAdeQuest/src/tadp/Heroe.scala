@@ -32,13 +32,13 @@ case class Heroe (stats: Stats = new Stats(100,20,45,5),
   def get_stat_principal(): Int = {
     val st = get_stats_actuales()
     trabajo match {      
-      case None => 0
+      case None => throw new Exception("No tiene trabajo asignado")
       case unTrabajo => unTrabajo.get.stat_principal match{
                         case Fuerza => st.fuerza
                         case Inteligencia => st.inteligencia
                         case Velocidad => st.velocidad
                         case Hp => st.hp
-                        case _ => 0
+                        case _ => throw new Exception("No tiene Stat Principal")
                       } 
     }
     

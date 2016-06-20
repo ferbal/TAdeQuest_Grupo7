@@ -28,17 +28,17 @@ class Tests {
 
     val sin_trabajo = None//new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})
     
-    val guerrero_job = new Trabajo (Guerrero, Fuerza, 
+    val guerrero_job = Trabajo (Guerrero, Fuerza, 
         {(st,x)=>
           st.incrementar(new Stats(10,15,0,-10))
           st 
         })
-    val mago_job = new Trabajo (Mago, Inteligencia, 
+    val mago_job = Trabajo (Mago, Inteligencia, 
         {(st,x)=>
           st.incrementar(new Stats(0,-20,0,20))
           st 
         })
-    val ladron_job = new Trabajo (Ladron, Velocidad, 
+    val ladron_job = Trabajo (Ladron, Velocidad, 
         {(st,x)=>
           st.incrementar(new Stats(-5,0,10,0))
           st 
@@ -85,9 +85,9 @@ class Tests {
   
   @Test
   def pruebaOrdenSuperior(): Unit = {
-    var warrior = new Heroe
-    var theif = new Heroe
-    var wizard = new Heroe
+    var warrior = Heroe()
+    var theif = Heroe()
+    var wizard = Heroe()
 
     val efecto_loco: (Stats, Heroe) => Stats = { (st, x) =>
       st.hp *= 2
@@ -142,7 +142,7 @@ class Tests {
     
     //unGuerrero = unGuerrero.utilizar_item(Talismanes, Vincha_Bufalo_Agua)
     
-    println("HP Actual: " + unGuerrero.get_stats_actuales.hp)    
+    //println("HP Actual: " + unGuerrero.get_stats_actuales.hp)    
     //unGuerrero = unGuerrero.utilizar_item(Talismanes, Vincha_Bufalo_Agua)
   
   }
