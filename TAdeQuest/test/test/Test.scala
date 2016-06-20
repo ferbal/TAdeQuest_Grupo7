@@ -3,6 +3,9 @@ package test
 import org.junit.Test
 import org.junit.Assert._
 import org.junit.Before
+import org.junit.Rule
+import org.junit.rules.ExpectedException
+import scala.annotation.meta.getter
 import tadp.Heroe
 import tadp.Item
 import tadp.Stats
@@ -47,6 +50,11 @@ class Tests {
            
         })
         
+     var conan = Heroe()
+     var robinHood = Heroe()
+     var gandalf = Heroe()
+     var equipo = Equipo()
+        
     val Vincha_Bufalo_Agua = new Item(Cabeza,
                                         { (st, x) =>
                                           if (x.stats.fuerza > x.stats.inteligencia) {
@@ -89,23 +97,41 @@ class Tests {
       else {x.copy(stats = x.stats.incrementar(new Stats(-10,0,0,0)))}},
       {(x,y)=> if(x.lider.trabajo.get.tipo == Guerrero){20} else {10}})
     
+  val tareaImposible = new Tarea(
+      {x=> x.copy(stats = x.stats.incrementar(new Stats(-20,-10,-10,-30)))},
+      {(x,y) => if(x.lider.get_stat_principal() > 100){10} else {throw new Exception()}}) 
+    
+  val misionAntiMonstruo = new Mision(
+      List[Tarea](pelearMonstruo),
+      {x=>x.copy(oro= x.oro *2)})
+    
   @Before
   def initialize(){
-    var conan = Heroe().cambiarTrabajoA(Some(guerrero_job))
-    var robinHood = Heroe().cambiarTrabajoA(Some(ladron_job))
-    var gandalf = Heroe().cambiarTrabajoA(Some(mago_job))
-    var equipo = Equipo(List[Heroe](conan, robinHood, gandalf), 100, "Dream Team")}
+      conan = Heroe().cambiarTrabajoA(Some(guerrero_job))
+      robinHood = Heroe().cambiarTrabajoA(Some(ladron_job))
+      gandalf = Heroe().cambiarTrabajoA(Some(mago_job))
+      equipo = Equipo(List[Heroe](conan, robinHood, gandalf), 100, "Dream Team")}
   
+    
   @Test
   def pruebaTareaExitosa(){
     
+      }
+  
+  @Test
+  def pruebaTareaFallida(){
+    try{
+    tareaImposible.realizarTarea(equipo)
+    fail("no se produjo la excepcion esperada")
+    }catch{
+      case e: Exception => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)
+    }
   }
-  
+
   @Test
-  def pruebaTareaFallida(){}
-  
-  @Test
-  def pruebaMisionExitosa(){}
+  def pruebaMisionExitosa(){
+    assertEquals(200, misionAntiMonstruo.realizarMision(equipo).oro)
+  }
   
   @Test
   def pruebaMisionFallida(){}
