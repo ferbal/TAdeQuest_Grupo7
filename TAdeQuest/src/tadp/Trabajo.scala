@@ -1,6 +1,6 @@
 package tadp
 
-class Trabajo (nombre:String, statPrincipal: String,  modificadorDeStats: (Stats,Heroe) => Stats){
+class Trabajo (nombre: Habilidad, statPrincipal: StatPrincipal,  modificadorDeStats: (Stats,Heroe) => Stats){
 
   val stat_principal = statPrincipal
   val tipo = nombre

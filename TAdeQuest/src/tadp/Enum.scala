@@ -1,26 +1,23 @@
 package tadp
 
-object Posicion extends Enumeration {
-  val CABEZA = "CABEZA"
-  val MANO_IZQ = "MANO_IZQUIERDA"
-  val MANO_DER = "MANO_DERECHA"
-  val AMBAS_MANOS = "AMBAS MANOS"
-  val TORSO = "TORSO"
-  val TALISMANES = "TALISMANES"
-}
+trait Posicion 
 
-object Habilidad extends Enumeration {
-  val GUERRERO = "GUERRERO"
-  val MAGO = "MAGO"
-  val LADRON = "LADRON"
-  val SIN_TRABAJO = "SIN TRABAJO"
-}
+case object Cabeza extends Posicion
+case object ManoIzq extends Posicion
+case object ManoDer extends Posicion
+case object AmbasManos extends Posicion
+case object Torso extends Posicion
+case object Talismanes extends Posicion
 
-object Stat_Principal extends Enumeration {
-  val NINGUNO = "NINGUNO"
-  val FUERZA = "FUERZA"
-  val HP = "HP"
-  val VELOCIDAD = "VELOCIDAD"
-  val INTELIGENCIA = "INTELIGENCIA"
-  
-}
+trait Habilidad
+
+case object Mago extends Habilidad
+case object Ladron extends Habilidad
+case object Guerrero extends Habilidad
+
+trait StatPrincipal
+
+case object Fuerza extends StatPrincipal
+case object Hp extends StatPrincipal
+case object Inteligencia extends StatPrincipal
+case object Velocidad extends StatPrincipal
