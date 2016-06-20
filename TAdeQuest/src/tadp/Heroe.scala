@@ -7,7 +7,7 @@ import scala.collection.mutable.MutableList
 
 case class Heroe (stats: Stats = Stats(100,20,45,5),
     inventario: Map[Posicion,Item] = Map[Posicion,Item](), 
-    talismanes: MutableList[Item] = MutableList[Item](),
+    talismanes: List[Item] = List[Item](),
     trabajo: Option[Trabajo] = None){//new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})){   
   
   
@@ -27,17 +27,16 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
   
   }
 
-  
   def get_stat_principal(): Int = {
     val st = get_stats_actuales()
     trabajo match {      
-      case None => 0
+      case None => throw new Exception("No tiene trabajo asignado")
       case unTrabajo => unTrabajo.get.stat_principal match{
                         case Fuerza => st.fuerza
                         case Inteligencia => st.inteligencia
                         case Velocidad => st.velocidad
                         case Hp => st.hp
-                        case _ => 0
+                        case _ => throw new Exception("No tiene Stat Principal")
                       } 
     }
     
@@ -49,7 +48,7 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
       
     case Talismanes => {
       var talismanesMutables = talismanes
-      talismanesMutables += item
+      talismanesMutables = item :: talismanes
       copy(talismanes = talismanesMutables)}
       
     case _ => {
