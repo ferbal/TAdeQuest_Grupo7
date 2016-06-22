@@ -24,8 +24,9 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
     val itemsTotales = inventario.values ++ talismanes
     
     itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}
-  }
 
+  }
+  
   def get_stat_principal(): Int = {
     val st = get_stats_actuales()
     trabajo match {      

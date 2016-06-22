@@ -2,7 +2,7 @@ package tadp
 
 import scala.util.control.Exception
 
-case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int, nombre: String) {
+case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: String = "Equipo") {
 
   def mejorHeroeSegun(f: Heroe => Int): List[Heroe] = {
     try {
