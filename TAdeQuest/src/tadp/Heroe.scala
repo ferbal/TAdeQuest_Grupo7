@@ -5,10 +5,10 @@ import scala.collection.mutable.Map
 import java.util.HashMap
 import scala.collection.mutable.MutableList
 
-case class Heroe (stats: Stats = new Stats(100,20,45,5),
+case class Heroe (stats: Stats = Stats(100,20,45,5),
     inventario: Map[Posicion,Item] = Map[Posicion,Item](), 
     talismanes: List[Item] = List[Item](),
-    trabajo: Option[Trabajo] = None){//new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})){   
+    trabajo: Option[Trabajo] = None){   
   
   
   def cambiarTrabajoA (nuevoTrabajo : Option[Trabajo]): Heroe ={
@@ -16,7 +16,7 @@ case class Heroe (stats: Stats = new Stats(100,20,45,5),
   }
   
   def get_stats_actuales():Stats = {    
-    var st : Stats = new Stats//this.stats
+    var st : Stats = stats //this.stats
 
     if (trabajo != None)
       st= trabajo.get.aplicarModificadorDeStats(st,this)  
@@ -24,8 +24,6 @@ case class Heroe (stats: Stats = new Stats(100,20,45,5),
     val itemsTotales = inventario.values ++ talismanes
     
     itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}
-    
-    return st    
   }
 
   def get_stat_principal(): Int = {
@@ -63,11 +61,22 @@ case class Heroe (stats: Stats = new Stats(100,20,45,5),
   }
   
   def validar_ubicacion (ubicacion_actual : Posicion , item_nuevo : Item) : Boolean = {
-    if (item_nuevo.ubicacion == AmbasManos && (ubicacion_actual == ManoDer|| ubicacion_actual == ManoIzq)){
-      return true
-    }else{
-      return item_nuevo.ubicacion == ubicacion_actual
-    }    
+    item_nuevo.ubicacion match {
+      case AmbasManos => verificoUbicacionActualDeMano(ubicacion_actual)
+      case ManoDer => verificoUbicacionActualDeMano(ubicacion_actual)
+      case ManoIzq => verificoUbicacionActualDeMano(ubicacion_actual)
+      case otra => otra == item_nuevo.ubicacion
+      }
+    }
+
+ 
+  def verificoUbicacionActualDeMano (ubicacion_actual : Posicion) : Boolean = {
+    ubicacion_actual match {
+        case AmbasManos => true
+        case ManoDer => true
+        case ManoIzq => true
+        case otra => false
+    }
   }
   
   def getTipoTrabajo (): Habilidad = { 
@@ -77,4 +86,5 @@ case class Heroe (stats: Stats = new Stats(100,20,45,5),
     }    
   }
 }
+
 
