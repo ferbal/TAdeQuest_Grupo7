@@ -3,10 +3,16 @@ package test
 import org.junit.Test
 import org.junit.Assert._
 import org.junit.Before
+import org.junit.Rule
+import org.junit.rules.ExpectedException
+import scala.annotation.meta.getter
 import tadp.Heroe
 import tadp.Item
 import tadp.Stats
 import tadp.Trabajo
+import tadp.Equipo
+import tadp.Tarea
+import tadp.Mision
 import tadp.Posicion
 import tadp.Habilidad
 import tadp.Guerrero
@@ -31,35 +37,37 @@ class Tests {
     val guerrero_job = Trabajo (Guerrero, Fuerza, 
         {(st,x)=>
           st.incrementar(new Stats(10,15,0,-10))
-          st 
+          
         })
     val mago_job = Trabajo (Mago, Inteligencia, 
         {(st,x)=>
           st.incrementar(new Stats(0,-20,0,20))
-          st 
+           
         })
     val ladron_job = Trabajo (Ladron, Velocidad, 
         {(st,x)=>
           st.incrementar(new Stats(-5,0,10,0))
-          st 
+           
         })
+        
+     var conan = Heroe()
+     var robinHood = Heroe()
+     var gandalf = Heroe()
+     var equipo = Equipo()
         
     val Vincha_Bufalo_Agua = new Item(Cabeza,
                                         { (st, x) =>
                                           if (x.stats.fuerza > x.stats.inteligencia) {
-                                            st.inteligencia += 30
+                                            st.incrementar(0,0,0,30)
                                           } else {
-                                            st.fuerza += 10
-                                            st.hp += 10
-                                            st.velocidad += 10
+                                            st.incrementar(10,10,10,0)
                                           }
-                                          st
+                                          
                                         },{ _.trabajo == None })
 
   val Palito_Magico = new Item(ManoDer,
     { (st, x) =>
       st.incrementar(new Stats(0, 0, 0, 20))
-      st
     },
     { x =>
       x.getTipoTrabajo() == Mago ||
@@ -69,20 +77,66 @@ class Tests {
      
   val Casco_Supremo = new Item(Cabeza,
       {(st, x) => st.incrementar(new Stats (x.stats.hp + 100,0,0,0))     
-     st},
+     },
      {x => true})
      
   val Espada_Doble = new Item(AmbasManos,
       {(st, x)=> st.incrementar(new Stats (50,0,0,0))     
-     st},
+     },
      {x=>true})
   
   val Espada_Zurda = new Item(ManoIzq,
       {(st, x)=> st.incrementar(new Stats (200,0,0,0))     
-     st
+     
    },
    {x=>true})
+    
+  val pelearMonstruo = new Tarea(
+      {x=> if(x.get_stats_actuales.fuerza < 20)
+      { x.copy(stats = x.stats.incrementar(new Stats(-20,0,0,0)))}
+      else {x.copy(stats = x.stats.incrementar(new Stats(-10,0,0,0)))}},
+      {(x,y)=> if(x.lider.trabajo.get.tipo == Guerrero){20} else {10}})
+    
+  val tareaImposible = new Tarea(
+      {x=> x.copy(stats = x.stats.incrementar(new Stats(-20,-10,-10,-30)))},
+      {(x,y) => if(x.lider.get_stat_principal() > 100){10} else {throw new Exception()}}) 
+    
+  val misionAntiMonstruo = new Mision(
+      List[Tarea](pelearMonstruo),
+      {x=>x.copy(oro= x.oro *2)})
+    
+  @Before
+  def initialize(){
+      conan = Heroe().cambiarTrabajoA(Some(guerrero_job))
+      robinHood = Heroe().cambiarTrabajoA(Some(ladron_job))
+      gandalf = Heroe().cambiarTrabajoA(Some(mago_job))
+      equipo = Equipo(List[Heroe](conan, robinHood, gandalf), 100, "Dream Team")}
   
+    
+  @Test
+  def pruebaTareaExitosa(){
+    
+      }
+  
+  @Test
+  def pruebaTareaFallida(){
+    try{
+    tareaImposible.realizarTarea(equipo)
+    fail("no se produjo la excepcion esperada")
+    }catch{
+      case e: Exception => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)
+    }
+  }
+
+  @Test
+  def pruebaMisionExitosa(){
+    assertEquals(200, misionAntiMonstruo.realizarMision(equipo).oro)
+  }
+  
+  @Test
+  def pruebaMisionFallida(){}
+  
+    
   @Test
   def pruebaOrdenSuperior(): Unit = {
     var warrior = Heroe()
@@ -90,8 +144,8 @@ class Tests {
     var wizard = Heroe()
 
     val efecto_loco: (Stats, Heroe) => Stats = { (st, x) =>
-      st.hp *= 2
-      st.fuerza += 5
+      st.copy(hp = st.hp * 2)
+      st.copy(fuerza = st.fuerza + 5)
       return st
     }
     
@@ -101,14 +155,14 @@ class Tests {
     assertEquals(200, warrior.get_stats_actuales().hp)    
 
   }
-  
+    
   @Test
   def pruebaInicial(): Unit = {
 
-    var unGuerrero = new Heroe
+    var unGuerrero =  Heroe()
     val unPalito = Palito_Magico
-    var unLadron = new Heroe
-    var unMago = new Heroe
+    var unLadron =  Heroe()
+    var unMago =  Heroe()
     val unaVincha = Vincha_Bufalo_Agua
 
     unGuerrero = unGuerrero.utilizar_item(Cabeza, Casco_Supremo)
@@ -138,7 +192,7 @@ class Tests {
     //assertEquals(false, unGuerrero.validar_ubicacion(ManoDer, Espada_Zurda))
     
     println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
-    assertEquals(260, unGuerrero.get_stats_actuales().hp)
+    assertEquals(360, unGuerrero.get_stats_actuales().hp)
     
     //unGuerrero = unGuerrero.utilizar_item(Talismanes, Vincha_Bufalo_Agua)
     
