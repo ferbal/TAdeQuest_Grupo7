@@ -74,6 +74,12 @@ class Tests {
         (x.getTipoTrabajo()  == Ladron &&
           x.stats.inteligencia > 30)
     })
+    
+  val Talisman = new Item(Talismanes,
+    { (st, x) =>
+      st.incrementar(new Stats(10, 0, 0, 0))
+    },
+    { x => true })
      
   val Casco_Supremo = new Item(Cabeza,
       {(st, x) => st.incrementar(new Stats (x.stats.hp + 100,0,0,0))     
@@ -199,6 +205,45 @@ class Tests {
     //println("HP Actual: " + unGuerrero.get_stats_actuales.hp)    
     //unGuerrero = unGuerrero.utilizar_item(Talismanes, Vincha_Bufalo_Agua)
   
+  }
+  
+  @Test
+  def PruebaCambiosDeItemsYTrabajos(): Unit = {
+   
+    println("Comienzo Test")
+    //Un Heroe NUEVO tiene un HP Base de 100  
+    var unGuerrero =  Heroe()
+    assertEquals(100, unGuerrero.get_stats_actuales().hp)
+    
+    //El trabajo GUERRERO le asigna +10 HP
+    unGuerrero = unGuerrero.cambiarTrabajoA(Some(guerrero_job))
+    assertEquals(110, unGuerrero.get_stats_actuales().hp)
+    
+    //El CASCO_SUPREMO le incrementa (el HP base + 100)
+    unGuerrero = unGuerrero.utilizar_item(Cabeza, Casco_Supremo)
+    
+    assertEquals(310, unGuerrero.get_stats_actuales().hp)
+    
+    //La Espada_Doble incrementa 50 unidades del HP
+    unGuerrero = unGuerrero.utilizar_item(AmbasManos, Espada_Doble)    
+    assertEquals(360, unGuerrero.get_stats_actuales().hp)
+    
+    //La Espada Zurda incrementa en 200 el HP. Desafectando la Espada Doble (restando los 50 de la ultima)
+    unGuerrero = unGuerrero.utilizar_item(AmbasManos, Espada_Zurda)
+    assertEquals(510, unGuerrero.get_stats_actuales().hp)
+    
+    //Volvemos a Asignar la Espada_Doble
+    unGuerrero = unGuerrero.utilizar_item(AmbasManos, Espada_Doble)    
+    assertEquals(360, unGuerrero.get_stats_actuales().hp)
+                   
+    //Dejar al Heroe sin trabajo reduce los 10 HP incrementado como Guerrero
+    unGuerrero = unGuerrero.cambiarTrabajoA(None)
+    assertEquals(350, unGuerrero.get_stats_actuales().hp)
+    
+    //Incorporo un Talisman Suma 50 HP
+    unGuerrero = unGuerrero.utilizar_item(Talismanes, Talisman)
+    assertEquals(360, unGuerrero.get_stats_actuales().hp)
+          
   }
   
   @Test
