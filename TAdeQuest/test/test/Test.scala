@@ -163,48 +163,26 @@ class Tests {
   }
     
   @Test
-  def pruebaInicial(): Unit = {
+  def pruebaValidacionUsoItems(): Unit = {
 
-    var unGuerrero =  Heroe()
-    val unPalito = Palito_Magico
     var unLadron =  Heroe()
-    var unMago =  Heroe()
-    val unaVincha = Vincha_Bufalo_Agua
-
-    unGuerrero = unGuerrero.utilizar_item(Cabeza, Casco_Supremo)
-    .utilizar_item(AmbasManos, Espada_Doble)
-    //guerrero.utilizar_item(Posicion.MANO_IZQ, Espada_Zurda)
-    .utilizar_item(AmbasManos, Espada_Doble)
-    //println("HP Base: " + guerrero.stats.hp)
-    //println("HP Trabajo: " + guerrero.trabajo.stats.hp)
-    println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
-    unGuerrero = unGuerrero.cambiarTrabajoA(Some(guerrero_job))
-    println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
+    var unMago =  Heroe()     
 
     unLadron = unLadron.cambiarTrabajoA(Some(ladron_job))
 
-    assertEquals(false, unaVincha.puede_usar(unLadron))
+    assertEquals(false, Vincha_Bufalo_Agua.puede_usar(unLadron))
 
     unLadron = unLadron.cambiarTrabajoA(sin_trabajo)
 
-    assertEquals(true, unaVincha.puede_usar(unLadron))
-
-    unLadron = unLadron.cambiarTrabajoA(Some(ladron_job))
+    assertEquals(true, Vincha_Bufalo_Agua.puede_usar(unLadron))
     
-    unMago = unMago.cambiarTrabajoA(Some(mago_job))
-
-    assertEquals(false, unPalito.puede_usar(unLadron))
-    //assertEquals(true, unPalito.puede_usar(unMago))
-    //assertEquals(false, unGuerrero.validar_ubicacion(ManoDer, Espada_Zurda))
-    
-    println("HP Actual: " + unGuerrero.get_stats_actuales.hp)
-    assertEquals(360, unGuerrero.get_stats_actuales().hp)
-    
-    //unGuerrero = unGuerrero.utilizar_item(Talismanes, Vincha_Bufalo_Agua)
-    
-    //println("HP Actual: " + unGuerrero.get_stats_actuales.hp)    
-    //unGuerrero = unGuerrero.utilizar_item(Talismanes, Vincha_Bufalo_Agua)
-  
+    try{
+        Palito_Magico.puede_usar(unLadron)
+        fail("No se produjo la excepcion esperada")
+    }catch{
+      case e: Exception => assertEquals("No tiene trabajo asignado", e.getMessage)
+    }
+      
   }
   
   @Test
