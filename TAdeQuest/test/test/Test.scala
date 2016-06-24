@@ -39,6 +39,7 @@ import tadp.Ladron_Job
 import scala.util.Success
 import tadp.Talisman_Maldito
 import tadp.Taberna
+import scala.util.Failure
 
 class Tests {
 
@@ -94,6 +95,7 @@ val pelearMonstruoParaLadrones =  new Tarea(
       } yield (res)
     })
 
+
   val misionAntiMonstruo = new Mision(
     List[Tarea](pelearMonstruo),
     { x =>
@@ -109,12 +111,22 @@ val pelearMonstruoParaLadrones =  new Tarea(
         eq <- x
         resEq <- eq.obtenerItem(unTalismanMaldito)
     }yield(resEq)})
+  
+  val misionImposible = Mision(
+    List[Tarea](tareaImposible),
+    { x =>
+      for{
+        eq <- x
+        resEq = eq.copy(oro = 1000 + (eq.oro * 2))
+    }yield(resEq)})
       
   val tabernaPosible = new Taberna()
   tabernaPosible.agregarMision(misionExploradora)
   tabernaPosible.agregarMision(misionAntiMonstruo)
   
   val tabernaImposible = new Taberna()
+  tabernaImposible.agregarMision(misionExploradora)
+  tabernaImposible.agregarMision(misionImposible)
 
   @Before
   def initialize() {
@@ -127,6 +139,7 @@ val pelearMonstruoParaLadrones =  new Tarea(
     equipoVago = Equipo(List[Heroe](vago, vagabundo), 100, "Straw Team")
     
   }
+
 
   @Test
   def pruebaTareaExitosa() {
@@ -161,7 +174,26 @@ val pelearMonstruoParaLadrones =  new Tarea(
   }
 
   @Test
-  def pruebaMisionFallida() {}
+  def pruebaMisionFallida() {
+    misionImposible.realizarMision(equipo) match{
+      case Success(x) => fail("no se produjo la excepcion esperada")
+      case Failure(e) => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)
+    }
+  }
+  @Test
+  def pruebaMisionFallida3() {
+    misionImposible.realizarMision(equipo) match{
+      case Success(x) => fail("no se produjo la excepcion esperada")
+      case Failure(e) => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)
+    }
+  }
+  @Test
+  def pruebaMisionFallida2() {
+     misionImposible.realizarMision(equipoVago) match{
+      case Success(x) => fail("no se produjo la excepcion esperada")
+      case Failure(e) => assertEquals("No tiene trabajo asignado", e.getMessage)
+    }
+  }
 
   @Test
   def pruebaOrdenSuperior(): Unit = {
@@ -245,14 +277,27 @@ val pelearMonstruoParaLadrones =  new Tarea(
 
   @Test
   def pruebaEligeEntreMisiones{
-    //La mision exploradora vende el item, mientras que la otra duplica su oro, pero el equipo empieza con 0 de oro
-    assertEquals(misionExploradora, tabernaPosible.elegirMision(equipo, {(x,y)=> println("Oro mision: "++ y.oro.toString)
-      x.oro < y.oro}))
+    //La mision exploradora vende el item (100+20), mientras que la otra duplica su oro(200)
+    assertEquals(misionAntiMonstruo, tabernaPosible.elegirMision(equipo, {(x,y)=> println("Oro despues de mision: "++ x.oro.toString)
+      x.oro > y.oro}))
   }
   
   @Test
   def pruebaEligeMisionPosibleAnteUnaPosibleYUnaImposible{
-    
+    //no importa la condicion, siempre se elige la mision que puede ser completada
+    assertEquals(misionExploradora, tabernaImposible.elegirMision(equipo, {(x,y)=> x.oro < y.oro}))
+    assertEquals(misionExploradora, tabernaImposible.elegirMision(equipo, {(x,y)=> x.oro > y.oro}))
+  }
+  
+  @Test 
+  def pruebaEntrenar{
+    assertEquals(220, tabernaPosible.entrenar(equipo, {(x,y)=> x.oro > y.oro}).oro)
+    assertEquals(240, tabernaPosible.entrenar(equipo, {(x,y)=> x.oro < y.oro}).oro)
+  }
+  
+  @Test
+  def pruebaEntrenarHastaFallar{
+    assertEquals(120, tabernaImposible.entrenar(equipo, {(x,y)=> x.oro > y.oro}).oro)
   }
 
 }

@@ -33,7 +33,7 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
           res = (stn - st) if (stn-st > 0)
         } yield { res }
       }) match {
-        case Nil => this.copy(oro = oro + 20) //no hay heroes aptos para equiparse el item, por lo que se vende (los heroes no tienen manager y ellos no saben cuanto valen cada item en el mercado actual)
+        case Nil => this//.copy( oro = oro + 20)
         case x :: xs => { reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item)) }
       })
   }
