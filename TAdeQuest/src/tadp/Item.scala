@@ -13,3 +13,12 @@ class Item (unaUbicacion: Posicion, efecto: (Stats, Heroe) => Stats, condicion: 
 
 }
 
+
+
+
+/*
+ * = ManoDer
+ 
+efecto: 
+condicion: 
+*/

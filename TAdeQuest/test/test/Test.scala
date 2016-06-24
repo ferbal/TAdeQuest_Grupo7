@@ -27,76 +27,37 @@ import tadp.ManoDer
 import tadp.AmbasManos
 import tadp.ManoIzq
 import tadp.Talismanes
+import tadp.Palito_Magico
+import tadp.Vincha_Bufalo_Agua
+import tadp.Talisman_Comun
+import tadp.Casco_Supremo
+import tadp.Espada_Doble
+import tadp.Espada_Zurda
+import tadp.Guerrero_Job
+import tadp.Mago_Job
+import tadp.Ladron_Job
 
 class Tests {
  
   //Cargamos la base de datos de items
 
     val sin_trabajo = None//new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})
+    val guerrero_job = Guerrero_Job()
+    val mago_job = Mago_Job()
+    val ladron_job = Ladron_Job()
     
-    val guerrero_job = Trabajo (Guerrero, Fuerza, 
-        {(st,x)=>
-          st.incrementar(new Stats(10,15,0,-10))
-          
-        })
-    val mago_job = Trabajo (Mago, Inteligencia, 
-        {(st,x)=>
-          st.incrementar(new Stats(0,-20,0,20))
-           
-        })
-    val ladron_job = Trabajo (Ladron, Velocidad, 
-        {(st,x)=>
-          st.incrementar(new Stats(-5,0,10,0))
-           
-        })
-        
-     var conan = Heroe()
-     var robinHood = Heroe()
-     var gandalf = Heroe()
-     var equipo = Equipo()
-        
-    val Vincha_Bufalo_Agua = new Item(Cabeza,
-                                        { (st, x) =>
-                                          if (x.stats.fuerza > x.stats.inteligencia) {
-                                            st.incrementar(0,0,0,30)
-                                          } else {
-                                            st.incrementar(10,10,10,0)
-                                          }
-                                          
-                                        },{ _.trabajo == None })
+    var conan = Heroe()
+    var robinHood = Heroe()
+    var gandalf = Heroe()
+    var equipo = Equipo()
+    
+    val unaVinchaBufaloAgua = Vincha_Bufalo_Agua()
+    val unPalitoMagico = Palito_Magico()
+    val unTalisman = Talisman_Comun()
+    val unCascoSupremo = Casco_Supremo()
+    val unaEspadaDoble = Espada_Doble()
+    val unaEspadaZurda = Espada_Zurda()
 
-  val Palito_Magico = new Item(ManoDer,
-    { (st, x) =>
-      st.incrementar(new Stats(0, 0, 0, 20))
-    },
-    { x =>
-      x.getTipoTrabajo() == Mago ||
-        (x.getTipoTrabajo()  == Ladron &&
-          x.stats.inteligencia > 30)
-    })
-    
-  val Talisman = new Item(Talismanes,
-    { (st, x) =>
-      st.incrementar(new Stats(10, 0, 0, 0))
-    },
-    { x => true })
-     
-  val Casco_Supremo = new Item(Cabeza,
-      {(st, x) => st.incrementar(new Stats (x.stats.hp + 100,0,0,0))     
-     },
-     {x => true})
-     
-  val Espada_Doble = new Item(AmbasManos,
-      {(st, x)=> st.incrementar(new Stats (50,0,0,0))     
-     },
-     {x=>true})
-  
-  val Espada_Zurda = new Item(ManoIzq,
-      {(st, x)=> st.incrementar(new Stats (200,0,0,0))     
-     
-   },
-   {x=>true})
-    
   val pelearMonstruo = new Tarea(
       {x=> if(x.get_stats_actuales.fuerza < 20)
       { x.copy(stats = x.stats.incrementar(new Stats(-20,0,0,0)))}
@@ -169,20 +130,20 @@ class Tests {
     var unMago =  Heroe()     
 
     unLadron = unLadron.cambiarTrabajoA(Some(ladron_job))
-
-    assertEquals(false, Vincha_Bufalo_Agua.puede_usar(unLadron))
+    
+    assertEquals(false, unaVinchaBufaloAgua.puede_usar(unLadron))
 
     unLadron = unLadron.cambiarTrabajoA(sin_trabajo)
-
-    assertEquals(true, Vincha_Bufalo_Agua.puede_usar(unLadron))
     
-    try{
-        Palito_Magico.puede_usar(unLadron)
+    assertEquals(true, unaVinchaBufaloAgua.puede_usar(unLadron))
+    
+    try{      
+        unPalitoMagico.puede_usar(unLadron)
         fail("No se produjo la excepcion esperada")
     }catch{
       case e: Exception => assertEquals("No tiene trabajo asignado", e.getMessage)
     }
-      
+     
   }
   
   @Test
@@ -198,20 +159,20 @@ class Tests {
     assertEquals(110, unGuerrero.get_stats_actuales().hp)
     
     //El CASCO_SUPREMO le incrementa (el HP base + 100)
-    unGuerrero = unGuerrero.utilizar_item(Cabeza, Casco_Supremo)
+    unGuerrero = unGuerrero.utilizar_item(Cabeza, unCascoSupremo)
     
     assertEquals(310, unGuerrero.get_stats_actuales().hp)
     
     //La Espada_Doble incrementa 50 unidades del HP
-    unGuerrero = unGuerrero.utilizar_item(AmbasManos, Espada_Doble)    
+    unGuerrero = unGuerrero.utilizar_item(AmbasManos, unaEspadaDoble)    
     assertEquals(360, unGuerrero.get_stats_actuales().hp)
     
     //La Espada Zurda incrementa en 200 el HP. Desafectando la Espada Doble (restando los 50 de la ultima)
-    unGuerrero = unGuerrero.utilizar_item(AmbasManos, Espada_Zurda)
+    unGuerrero = unGuerrero.utilizar_item(AmbasManos, unaEspadaZurda)
     assertEquals(510, unGuerrero.get_stats_actuales().hp)
     
     //Volvemos a Asignar la Espada_Doble
-    unGuerrero = unGuerrero.utilizar_item(AmbasManos, Espada_Doble)    
+    unGuerrero = unGuerrero.utilizar_item(AmbasManos, unaEspadaDoble)    
     assertEquals(360, unGuerrero.get_stats_actuales().hp)
                    
     //Dejar al Heroe sin trabajo reduce los 10 HP incrementado como Guerrero
@@ -219,9 +180,9 @@ class Tests {
     assertEquals(350, unGuerrero.get_stats_actuales().hp)
     
     //Incorporo un Talisman Suma 50 HP
-    unGuerrero = unGuerrero.utilizar_item(Talismanes, Talisman)
+    unGuerrero = unGuerrero.utilizar_item(Talismanes, unTalisman)
     assertEquals(360, unGuerrero.get_stats_actuales().hp)
-          
+        
   }
   
   @Test

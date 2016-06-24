@@ -1,73 +1,21 @@
-//package tadp
-//
-//class Talisman extends Item {
-//  ubicacion = "Mano Derecha";
-//  //Hace que la fuerza del Heroe sea igual a la de su HP
-//  def beneficios(unHeroe : Heroe): Stats = {
-//     var st = new Stats (10,0,0,0)     
-//     st
-//   }
-//  def puede_usar(unHeroe : Heroe) : Boolean = {
-//    true
-//  }
-//}
-//
-////Stats(HP,Fuerza,Velocidad,Inteligencia)
-//class Talisman_Dedicacion () extends Item {  
-//  ubicacion = Posicion.TALISMANES  
-//  def beneficios(unHeroe : Heroe): Stats = {
-//     var st = new Stats (0,0,0,0) //Aumenta 10 % todos los stats (del valor principal del Stat de trabajo)
-//     st
-//  }  
-//  def puede_usar(unHeroe : Heroe) : Boolean = {
-//    true
-//  }
-//}
-//
-////Stats(HP,Fuerza,Velocidad,Inteligencia)
-//class Talisman_Minimalismo () extends Item {  
-//  ubicacion = Posicion.TALISMANES  
-//  def beneficios(unHeroe : Heroe): Stats = {
-//     var st = new Stats (50,0,0,0) //-10 hp por cada otro item equipado     
-//     st
-//  }  
-//  def puede_usar(unHeroe : Heroe) : Boolean = {
-//    true
-//  }
-//}
-//
-////Stats(HP,Fuerza,Velocidad,Inteligencia)
-//class Vincha_Bufalo_Agua () extends Item {  
-//  
-//  ubicacion = Posicion.CABEZA  
-//  
-//  def beneficios(unHeroe : Heroe): Stats = {     
-//      var st = new Stats 
-//      if (unHeroe.stats.fuerza > unHeroe.stats.inteligencia){
-//        st.inteligencia +=30        
-//      }else {
-//        st.fuerza += 10
-//        st.hp +=10
-//        st.velocidad +=10 
-//      }        
-//     st
-//  }  
-//  
-//  def puede_usar(unHeroe : Heroe) : Boolean = {
-//    unHeroe.trabajo.stat_principal == "Sin Trabajo"
-//  }
-//}
-//
-//class Talisman_Maldito () extends Item {  
-//  
-//  ubicacion = Posicion.CABEZA  
-//  
-//  def beneficios(unHeroe : Heroe): Stats = {     
-//      var st = new Stats (1,1,1,1)            
-//     st
-//  }  
-//  
-//  def puede_usar(unHeroe : Heroe) : Boolean = {
-//    true
-//  }
-//}
+package tadp
+
+case class Talisman_De_Dedicacion (unaUbicacion : Posicion = Talismanes, 
+                          efecto : (Stats,Heroe) => Stats = (unStat,unHeroe) => unHeroe.aplicarFuncionStatPrincipal(unHeroe, i => i * 10 / 100), 
+                          condicion : Heroe => Boolean = unHeroe => unHeroe.getTipoTrabajo() != Ladron && unHeroe.stats.fuerza > 20                           
+                          ) extends Item(unaUbicacion,efecto,condicion)
+
+case class Talisman_del_Minimalismo (unaUbicacion : Posicion = Talismanes, 
+                          efecto : (Stats,Heroe) => Stats = (unStat,unHeroe) => new Stats(50 - unHeroe.cantidadItemsEquipados()*10,0,0,0), 
+                          condicion : Heroe => Boolean = unHeroe => true                          
+                          ) extends Item(unaUbicacion,efecto,condicion)
+
+case class Talisman_Maldito (unaUbicacion : Posicion = Talismanes, 
+                          efecto : (Stats,Heroe) => Stats = (unStat,unHeroe) => new Stats(1,1,1,1), 
+                          condicion : Heroe => Boolean = unHeroe => true                          
+                          ) extends Item(unaUbicacion,efecto,condicion)
+
+case class Talisman_Comun (unaUbicacion : Posicion = Talismanes, 
+                          efecto : (Stats,Heroe) => Stats = (unStat,unHeroe) => unStat.incrementar(new Stats(10,0,0,0)), 
+                          condicion : Heroe => Boolean = unHeroe => true                          
+                          ) extends Item(unaUbicacion,efecto,condicion)

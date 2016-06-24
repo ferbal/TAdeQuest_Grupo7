@@ -38,8 +38,24 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
                         case Hp => st.hp
                         case _ => throw new Exception("No tiene Stat Principal")
                       } 
+    }   
+  }
+  
+  def getTipoStatPrincipal () : StatPrincipal = {
+    trabajo match {
+      case None => throw new Exception("No tiene trabajo asignado")
+      case unTrabajo => unTrabajo.get.stat_principal
+    }   
+  }
+  
+  def aplicarFuncionStatPrincipal(unHeroe : Heroe,funcion : (Int => Int)):Stats = {    
+    this.getTipoStatPrincipal() match {
+      case Fuerza => new Stats(funcion(this.stats.fuerza) ,funcion(this.stats.fuerza),funcion(this.stats.fuerza),funcion(this.stats.fuerza))
+      case Hp => new Stats(funcion(this.stats.hp),funcion(this.stats.hp),funcion(this.stats.hp),funcion(this.stats.hp))
+      case Inteligencia => new Stats(funcion(this.stats.inteligencia),funcion(this.stats.inteligencia),funcion(this.stats.inteligencia),funcion(this.stats.inteligencia))
+      case Velocidad => new Stats(funcion(this.stats.velocidad),funcion(this.stats.velocidad),funcion(this.stats.velocidad),funcion(this.stats.velocidad))
+      case _ => new Stats(0,0,0,0)
     }
-    
   }
   
   def utilizar_item (ubicacion: Posicion,item : Item): Heroe = {
@@ -59,6 +75,10 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
       invMutable.update(ubicacion, item)
       copy(inventario = invMutable)}
     }  
+  }
+  
+  def cantidadItemsEquipados () : Int = {
+    inventario.count{ x => true } + talismanes.count { x => true }
   }
   
   def validar_ubicacion (ubicacion_actual : Posicion , item_nuevo : Item) : Boolean = {
