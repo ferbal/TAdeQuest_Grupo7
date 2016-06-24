@@ -4,6 +4,9 @@ import com.sun.beans.decoder.TrueElementHandler
 import scala.collection.mutable.Map
 import java.util.HashMap
 import scala.collection.mutable.MutableList
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
 
 case class Heroe (stats: Stats = Stats(100,20,45,5),
     inventario: Map[Posicion,Item] = Map[Posicion,Item](), 
@@ -27,16 +30,16 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
 
   }
   
-  def get_stat_principal(): Int = {
+  def get_stat_principal(): Try[Int] = {
     val st = get_stats_actuales()
     trabajo match {      
       case None => throw new Exception("No tiene trabajo asignado")
       case unTrabajo => unTrabajo.get.stat_principal match{
-                        case Fuerza => st.fuerza
-                        case Inteligencia => st.inteligencia
-                        case Velocidad => st.velocidad
-                        case Hp => st.hp
-                        case _ => throw new Exception("No tiene Stat Principal")
+                        case Fuerza => Success(st.fuerza)
+                        case Inteligencia => Success(st.inteligencia)
+                        case Velocidad => Success(st.velocidad)
+                        case Hp => Success(st.hp)
+                        case _ => Failure(new Exception("No tiene Stat Principal"))
                       } 
     }   
   }

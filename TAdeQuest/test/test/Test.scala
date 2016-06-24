@@ -66,7 +66,7 @@ class Tests {
     
   val tareaImposible = new Tarea(
       {x=> x.copy(stats = x.stats.incrementar(new Stats(-20,-10,-10,-30)))},
-      {(x,y) => if(x.lider.get_stat_principal() > 100){10} else {throw new Exception()}}) 
+      {(x,y) => if(x.lider.get_stat_principal() > 100){10} else {throw new Exception()}}) //revisar esto
     
   val misionAntiMonstruo = new Mision(
       List[Tarea](pelearMonstruo),
