@@ -30,26 +30,27 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
         for {
           stn <- statnuevo
           st <- x.get_stat_principal
-        } yield { stn - st }
+          res = (stn - st) if (stn-st > 0)
+        } yield { res }
       }) match {
-        case Nil     => this //no hay heroes aptos para equiparse el item, por lo que se descarta
-        case x :: xs => reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item))
+        case Nil => this.copy(oro = oro + 20) //no hay heroes aptos para equiparse el item, por lo que se vende (los heroes no tienen manager y ellos no saben cuanto valen cada item en el mercado actual)
+        case x :: xs => { reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item)) }
       })
   }
 
   def obtenerMiembro(heroe: Heroe): Equipo = {
     copy(heroes = heroe :: heroes)
   }
-  def contieneEsteHeroe(heroe:Heroe)={
+  def contieneEsteHeroe(heroe: Heroe) = {
     heroes.contains(heroe)
   }
-  def reemplazarMiembro(viejo:Heroe, nuevo:Heroe)={
+  def reemplazarMiembro(viejo: Heroe, nuevo: Heroe) = {
     var nuevaLista = heroes.diff(List(viejo))
-    copy(heroes = nuevo::nuevaLista)
+    copy(heroes = nuevo :: nuevaLista)
   }
- // def reemplazarMiembro(reemplazado: Heroe, reemplazo: Heroe): Equipo = {
- //   copy(heroes.updated(heroes.indexOf(reemplazado), reemplazo))
- // }
+  // def reemplazarMiembro(reemplazado: Heroe, reemplazo: Heroe): Equipo = {
+  //   copy(heroes.updated(heroes.indexOf(reemplazado), reemplazo))
+  // }
 
   def lider: Heroe = {
     mejorHeroeSegun({ x => for (st <- x.get_stat_principal) yield (st)

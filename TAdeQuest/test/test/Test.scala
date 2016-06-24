@@ -37,12 +37,14 @@ import tadp.Guerrero_Job
 import tadp.Mago_Job
 import tadp.Ladron_Job
 import scala.util.Success
+import tadp.Talisman_Maldito
+import tadp.Taberna
 
 class Tests {
 
   //Cargamos la base de datos de items
 
-  val sin_trabajo = None //new Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})
+  val sin_trabajo = None // Trabajo(Habilidad.SIN_TRABAJO, Stat_Principal.NINGUNO, {(st,x)=> st})
   val guerrero_job = Guerrero_Job()
   val mago_job = Mago_Job()
   val ladron_job = Ladron_Job()
@@ -61,23 +63,30 @@ class Tests {
   val unCascoSupremo = Casco_Supremo()
   val unaEspadaDoble = Espada_Doble()
   val unaEspadaZurda = Espada_Zurda()
+  val unTalismanMaldito = Talisman_Maldito()
 
-  val pelearMonstruo = new Tarea(
+  val pelearMonstruo =  new Tarea(
     { x =>
-      if (x.get_stats_actuales.fuerza < 20) { x.copy(stats = x.stats.incrementar(new Stats(-20, 0, 0, 0))) }
-      else { x.copy(stats = x.stats.incrementar(new Stats(-10, 0, 0, 0))) }
+      if (x.get_stats_actuales.fuerza < 20) { x.copy(stats = x.stats.incrementar( Stats(-20, 0, 0, 0))) }
+      else { x.copy(stats = x.stats.incrementar( Stats(-10, 0, 0, 0))) }
     },
     { (x, y) => if (x.lider.trabajo.get.tipo == Guerrero) { Success(20) } else { Success(10) } })
   
-val pelearMonstruoParaLadrones = new Tarea(
+val pelearMonstruoParaLadrones =  new Tarea(
     { x =>
-      if (x.get_stats_actuales.fuerza < 20) { x.copy(stats = x.stats.incrementar(new Stats(-20, 0, 0, 0))) }
-      else { x.copy(stats = x.stats.incrementar(new Stats(-10, 0, 0, 0))) }
+      if (x.get_stats_actuales.fuerza < 20) { x.copy(stats = x.stats.incrementar( Stats(-20, 0, 0, 0))) }
+      else { x.copy(stats = x.stats.incrementar( Stats(-10, 0, 0, 0))) }
     },
     { (x, y) => if (y.trabajo.get.tipo == Ladron) { Success(20) } else { Success(10) } })
   
-  val tareaImposible = new Tarea(
-    { x => x.copy(stats = x.stats.incrementar(new Stats(-20, -10, -10, -30))) },
+  val tareaExploraBosqueEncantado = new Tarea ({ x => x.copy(stats = x.stats.incrementar( Stats(-10, -10, +20, +30))) },
+      {(x, y) => if (y.getTipoTrabajo == Mago) {Success(y.get_stats_actuales.inteligencia*2)} else {Success(y.get_stats_actuales.velocidad)}})
+
+  val tareaExploraPrisionInfernal = new Tarea ({x => x.utilizar_item(Talismanes,unTalisman)},
+      {(x, y)=> if(x.lider.trabajo.get.tipo == Ladron){Success(y.get_stats_actuales().inteligencia)}else{Success(1)}})
+  
+  val tareaImposible =  new Tarea(
+    { x => x.copy(stats = x.stats.incrementar( Stats(-20, -10, -10, -30))) },
     { (x, y) =>
       for {
         st <- x.lider.get_stat_principal
@@ -92,6 +101,20 @@ val pelearMonstruoParaLadrones = new Tarea(
         eq <- x
         resEq = eq.copy(oro = eq.oro * 2)
     }yield(resEq)})
+  
+  val misionExploradora = new Mision(
+      List(tareaExploraBosqueEncantado, tareaExploraPrisionInfernal),
+      { x =>
+      for{
+        eq <- x
+        resEq <- eq.obtenerItem(unTalismanMaldito)
+    }yield(resEq)})
+      
+  val tabernaPosible = new Taberna()
+  tabernaPosible.agregarMision(misionExploradora)
+  tabernaPosible.agregarMision(misionAntiMonstruo)
+  
+  val tabernaImposible = new Taberna()
 
   @Before
   def initialize() {
@@ -108,9 +131,11 @@ val pelearMonstruoParaLadrones = new Tarea(
   @Test
   def pruebaTareaExitosa() {
       val res = pelearMonstruoParaLadrones.realizarTarea(equipo)
-      val ladronPostPelea =  robinHood.copy(stats = robinHood.stats.incrementar(new Stats(-10, 0, 0, 0)))
-      print(ladronPostPelea.get_stats_actuales().hp)
+      val ladronPostPelea =  robinHood.copy(stats = robinHood.stats.incrementar( Stats(-10, 0, 0, 0)))
+      println("Stats ladron: " ++ ladronPostPelea.get_stats_actuales().hp.toString)
+      println("Stats Equipo: ")
       res.get.heroes.foreach { x => print(x.get_stats_actuales().hp.toString()++"/") }
+      println
       assertTrue(res.get.contieneEsteHeroe(ladronPostPelea))
   }
   @Test
@@ -150,7 +175,7 @@ val pelearMonstruoParaLadrones = new Tarea(
       return st
     }
 
-    val Casco_Loco = new Item(Cabeza, efecto_loco, { x => true })
+    val Casco_Loco =  new Item(Cabeza, efecto_loco, { x => true })
     assertEquals(100, warrior.stats.hp)
     warrior = warrior.utilizar_item(Cabeza, Casco_Loco)
     assertEquals(200, warrior.get_stats_actuales().hp)
@@ -183,7 +208,6 @@ val pelearMonstruoParaLadrones = new Tarea(
   @Test
   def PruebaCambiosDeItemsYTrabajos(): Unit = {
 
-    println("Comienzo Test")
     //Un Heroe NUEVO tiene un HP Base de 100  
     var unGuerrero = Heroe()
     assertEquals(100, unGuerrero.get_stats_actuales().hp)
@@ -220,10 +244,15 @@ val pelearMonstruoParaLadrones = new Tarea(
   }
 
   @Test
-  def pruebaDeTrabajos(): Unit = {
-    var warrior = new Heroe
-    warrior = warrior.cambiarTrabajoA(Some(guerrero_job))
-
+  def pruebaEligeEntreMisiones{
+    //La mision exploradora vende el item, mientras que la otra duplica su oro, pero el equipo empieza con 0 de oro
+    assertEquals(misionExploradora, tabernaPosible.elegirMision(equipo, {(x,y)=> println("Oro mision: "++ y.oro.toString)
+      x.oro < y.oro}))
+  }
+  
+  @Test
+  def pruebaEligeMisionPosibleAnteUnaPosibleYUnaImposible{
+    
   }
 
 }

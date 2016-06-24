@@ -11,7 +11,7 @@ class Taberna {
   type TuplaDeEquipos = (Try[Equipo], Try[Equipo])
 
   def agregarMision(mision: Mision) = {
-    mision :: misiones
+    misiones = mision :: misiones
   }
 
   def mejorMisionSegunCriterio(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, mision1: Try[Mision], mision2: Try[Mision]): Try[Mision] = {
