@@ -48,9 +48,12 @@ class Tests {
   val ladron_job = Ladron_Job()
 
   var conan = Heroe()
+  var vago = Heroe()
+  var vagabundo = Heroe()
   var robinHood = Heroe()
   var gandalf = Heroe()
   var equipo = Equipo()
+  var equipoVago = Equipo()
 
   val unaVinchaBufaloAgua = Vincha_Bufalo_Agua()
   val unPalitoMagico = Palito_Magico()
@@ -65,7 +68,14 @@ class Tests {
       else { x.copy(stats = x.stats.incrementar(new Stats(-10, 0, 0, 0))) }
     },
     { (x, y) => if (x.lider.trabajo.get.tipo == Guerrero) { Success(20) } else { Success(10) } })
-
+  
+val pelearMonstruoParaLadrones = new Tarea(
+    { x =>
+      if (x.get_stats_actuales.fuerza < 20) { x.copy(stats = x.stats.incrementar(new Stats(-20, 0, 0, 0))) }
+      else { x.copy(stats = x.stats.incrementar(new Stats(-10, 0, 0, 0))) }
+    },
+    { (x, y) => if (y.trabajo.get.tipo == Ladron) { Success(20) } else { Success(10) } })
+  
   val tareaImposible = new Tarea(
     { x => x.copy(stats = x.stats.incrementar(new Stats(-20, -10, -10, -30))) },
     { (x, y) =>
@@ -88,18 +98,31 @@ class Tests {
     conan = Heroe().cambiarTrabajoA(Some(guerrero_job))
     robinHood = Heroe().cambiarTrabajoA(Some(ladron_job))
     gandalf = Heroe().cambiarTrabajoA(Some(mago_job))
+    vago = Heroe().cambiarTrabajoA(None)
+    vagabundo = Heroe().cambiarTrabajoA(None)
     equipo = Equipo(List[Heroe](conan, robinHood, gandalf), 100, "Dream Team")
+    equipoVago = Equipo(List[Heroe](vago, vagabundo), 100, "Straw Team")
+    
   }
 
   @Test
   def pruebaTareaExitosa() {
-
+      val res = pelearMonstruoParaLadrones.realizarTarea(equipo)
+      val ladronPostPelea =  robinHood.copy(stats = robinHood.stats.incrementar(new Stats(-10, 0, 0, 0)))
+      print(ladronPostPelea.get_stats_actuales().hp)
+      res.get.heroes.foreach { x => print(x.get_stats_actuales().hp.toString()++"/") }
+      assertTrue(res.get.contieneEsteHeroe(ladronPostPelea))
+  }
+  @Test
+  def testEquipoContieneUnHeroe() {
+    val asd = Heroe().cambiarTrabajoA(Some(ladron_job))
+   assertTrue( equipo.contieneEsteHeroe(asd))
   }
 
   @Test
   def pruebaTareaFallida() {
     try {
-      tareaImposible.realizarTarea(equipo)
+      tareaImposible.realizarTarea(equipo).get
       fail("no se produjo la excepcion esperada")
     } catch {
       case e: Exception => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)

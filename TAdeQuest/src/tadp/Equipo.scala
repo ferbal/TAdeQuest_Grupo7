@@ -40,10 +40,16 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
   def obtenerMiembro(heroe: Heroe): Equipo = {
     copy(heroes = heroe :: heroes)
   }
-
-  def reemplazarMiembro(reemplazado: Heroe, reemplazo: Heroe): Equipo = {
-    copy(heroes.updated(heroes.indexOf(reemplazado), reemplazo))
+  def contieneEsteHeroe(heroe:Heroe)={
+    heroes.contains(heroe)
   }
+  def reemplazarMiembro(viejo:Heroe, nuevo:Heroe)={
+    var nuevaLista = heroes.diff(List(viejo))
+    copy(heroes = nuevo::nuevaLista)
+  }
+ // def reemplazarMiembro(reemplazado: Heroe, reemplazo: Heroe): Equipo = {
+ //   copy(heroes.updated(heroes.indexOf(reemplazado), reemplazo))
+ // }
 
   def lider: Heroe = {
     mejorHeroeSegun({ x => for (st <- x.get_stat_principal) yield (st)
