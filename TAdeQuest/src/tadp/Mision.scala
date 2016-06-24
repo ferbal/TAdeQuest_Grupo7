@@ -2,7 +2,11 @@ package tadp
 
 import scala.util.Try
 
-class Mision(tareas: List[Tarea] = List[Tarea](), recompensa: Try[Equipo] => Try[Equipo]) {
+case class Mision(tareas: List[Tarea] = List[Tarea](), recompensa: Try[Equipo] => Try[Equipo]) {
+  
+  def agregarTarea(tarea:Tarea){
+   copy(tareas = tarea::tareas)
+  }
 
   def realizarMision(equipo: Try[Equipo]): Try[Equipo] ={
     for{
