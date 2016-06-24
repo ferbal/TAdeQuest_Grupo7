@@ -1,14 +1,14 @@
 package tadp
 
-class Mision (tareas: List[Tarea] = List[Tarea](), recompensa: Equipo => Equipo){
+import scala.util.Try
+
+class Mision (tareas: List[Tarea] = List[Tarea](), recompensa: Try[Equipo] => Try[Equipo]){
   
-  def realizarMision(equipo:Equipo): Equipo = {
+  def realizarMision(equipo:Equipo): Try[Equipo] = {
     
-    try{
-    recompensa(tareas.foldLeft(equipo){(x, y) => y.realizarTarea(x)})
-    }catch{
-      case _ => equipo
-    }
+   
+    recompensa(tareas.foldLeft(Try(equipo)){(x, y) => y.realizarTareaRecibeTry(x)})
+   
     
   }
   

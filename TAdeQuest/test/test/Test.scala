@@ -77,7 +77,11 @@ class Tests {
 
   val misionAntiMonstruo = new Mision(
     List[Tarea](pelearMonstruo),
-    { x => x.copy(oro = x.oro * 2) })
+    { x =>
+      for{
+        eq <- x
+        resEq = eq.copy(oro = eq.oro * 2)
+    }yield(resEq)})
 
   @Before
   def initialize() {
@@ -104,7 +108,8 @@ class Tests {
 
   @Test
   def pruebaMisionExitosa() {
-    assertEquals(200, misionAntiMonstruo.realizarMision(equipo).oro)
+    var res =for(eq <- misionAntiMonstruo.realizarMision(equipo))yield(eq)
+    assertEquals(200, res.get.oro)
   }
 
   @Test
