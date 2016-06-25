@@ -47,11 +47,13 @@ class Taberna {
   }
 
   def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Equipo = {
-    elegirMision(equipo, criterio, misionesRestantes).realizarMision(equipo) match {
+    val elegida = elegirMision(equipo, criterio, misionesRestantes)
+    val restantes = misionesRestantes.diff(List(elegida))
+    elegida.realizarMision(equipo) match {
       case Failure(e) => equipo
-      case Success(x) => misionesRestantes match {
-        case y :: Nil => x
-        case y :: ys  => entrenar(x, criterio, ys)
+      case Success(x) => restantes match {
+        case Nil => x
+        case list  => entrenar(x, criterio, list)
       }
     }
 

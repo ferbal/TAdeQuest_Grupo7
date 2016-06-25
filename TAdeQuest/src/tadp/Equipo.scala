@@ -33,7 +33,7 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
           res = (stn - st) if (stn-st > 0)
         } yield { res }
       }) match {
-        case Nil => this//.copy( oro = oro + 20)
+        case Nil => this.copy( oro = this.oro + 20)
         case x :: xs => { reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item)) }
       })
   }
