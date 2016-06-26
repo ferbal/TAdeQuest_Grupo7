@@ -7,7 +7,7 @@ import scala.util.Failure
 
 case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: String = "Equipo") {
 
-  def mejorHeroeSegun(f: Heroe => Try[Int]): List[Heroe] = {
+  def mejorHeroeSegun(f: Heroe => Option[Int]): List[Heroe] = {
     heroes match {
       case x :: Nil => x :: Nil
       case x :: xs =>
@@ -23,8 +23,7 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
     }
   }
 
-  def obtenerItem(item: Item): Try[Equipo] = {
-    Try(
+  def obtenerItem(item: Item): Equipo = {
       mejorHeroeSegun({ x =>
         var statnuevo = x.utilizar_item(item.ubicacion, item).get_stat_principal
         for {
@@ -35,7 +34,7 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
       }) match {
         case Nil => this.copy( oro = this.oro + 20)
         case x :: xs => { reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item)) }
-      })
+      }
   }
 
   def obtenerMiembro(heroe: Heroe): Equipo = {
@@ -52,13 +51,14 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
   //   copy(heroes.updated(heroes.indexOf(reemplazado), reemplazo))
   // }
 
-  def lider: Heroe = {
+  def lider: Option[Heroe] = {
     mejorHeroeSegun({ x => for (st <- x.get_stat_principal) yield (st)
 
     }) match {
-      case x :: Nil => x
-      case x :: xs  => throw new Exception("Hay mas de un Lider, por lo tanto nadie es Lider")
-      case Nil      => throw new Exception("No hay Lider")
+      case x :: Nil => Some(x)
+      case x :: xs  => None
+      case Nil      => None
     }
   }
+ 
 }

@@ -14,14 +14,14 @@ class Taberna {
     misiones = mision :: misiones
   }
 
-  def mejorMisionSegunCriterio(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, mision1: Try[Mision], mision2: Try[Mision]): Try[Mision] = {
+  def mejorMisionSegunCriterio(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, mision1: Mision, mision2: Mision): Mision = {
 
-    var equiposResultantes = (mision1.get.realizarMision(equipo), mision2.get.realizarMision(equipo))
+    var equiposResultantes = (mision1.resultadoMision(equipo), mision2.resultadoMision(equipo))
     equiposResultantes match {
-      case (Failure(_), Success(eq)) => mision2
-      case (Success(eq), Failure(_)) => mision1
-      case (Failure(ex), Failure(_)) => throw new TodasLasMisionesFallaronException()
-      case (Success(eq1), Success(eq2)) =>
+      case (Fallo(_,_), Exito(_,_)) => mision2
+      case (Exito(_,_), Fallo(_,_)) => mision1
+      case (Fallo(_,_), Fallo(_,_)) => throw new TodasLasMisionesFallaronException()
+      case (Exito(eq1,_), Exito(eq2,_)) =>
         criterio(eq1, eq2) match {
           case true  => mision1
           case false => mision2
@@ -32,10 +32,7 @@ class Taberna {
 
   def elegirMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Mision = {
 
-    var listaDeTryDeMisiones: List[Try[Mision]] = misionesRestantes.map { x => Success(x) }
-    var res = listaDeTryDeMisiones.reduceLeft({ (x, y) => mejorMisionSegunCriterio(equipo, criterio, x, y) })
-    res.get
-
+    misionesRestantes.reduceLeft({ (x, y) => mejorMisionSegunCriterio(equipo, criterio, x, y) })
   }
 
   def elegirMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Mision = {
@@ -49,9 +46,9 @@ class Taberna {
   def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Equipo = {
     val elegida = elegirMision(equipo, criterio, misionesRestantes)
     val restantes = misionesRestantes.diff(List(elegida))
-    elegida.realizarMision(equipo) match {
-      case Failure(e) => equipo
-      case Success(x) => restantes match {
+    elegida.resultadoMision(equipo) match {
+      case Fallo(_,_) => equipo
+      case Exito(x, y) => restantes match {
         case Nil => x
         case list  => entrenar(x, criterio, list)
       }

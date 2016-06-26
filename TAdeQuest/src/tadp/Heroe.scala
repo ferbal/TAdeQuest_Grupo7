@@ -30,24 +30,17 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
 
   }
   
-  def get_stat_principal(): Try[Int] = {
+  def get_stat_principal(): Option[Int] = {
     val st = get_stats_actuales()
     trabajo match {      
-      case None => throw new Exception("No tiene trabajo asignado")
+      case None => None
       case unTrabajo => unTrabajo.get.stat_principal match{
-                        case Fuerza => Success(st.fuerza)
-                        case Inteligencia => Success(st.inteligencia)
-                        case Velocidad => Success(st.velocidad)
-                        case Hp => Success(st.hp)
-                        case _ => Failure(new Exception("No tiene Stat Principal"))
+                        case Fuerza => Some(st.fuerza)
+                        case Inteligencia => Some(st.inteligencia)
+                        case Velocidad => Some(st.velocidad)
+                        case Hp => Some(st.hp)
+                        case _ => None
                       } 
-    }   
-  }
-  
-  def getTipoStatPrincipal () : StatPrincipal = {
-    trabajo match {
-      case None => throw new Exception("No tiene trabajo asignado")
-      case unTrabajo => unTrabajo.get.stat_principal
     }   
   }
   
@@ -108,6 +101,13 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
       case None => throw new Exception("No tiene trabajo asignado")
       case unTrabajo => unTrabajo.get.tipo
     }    
+  }
+  
+    def getTipoStatPrincipal () : StatPrincipal = { //TODO 
+    trabajo match {
+      case None => throw new Exception("No tiene trabajo asignado")
+      case unTrabajo => unTrabajo.get.stat_principal
+    }   
   }
 }
 

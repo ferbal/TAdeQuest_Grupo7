@@ -12,6 +12,7 @@ import tadp.Stats
 import tadp.Trabajo
 import tadp.Equipo
 import tadp.Tarea
+import tadp.ResultadoTarea
 import tadp.Mision
 import tadp.Posicion
 import tadp.Habilidad
@@ -40,6 +41,8 @@ import scala.util.Success
 import tadp.Talisman_Maldito
 import tadp.Taberna
 import scala.util.Failure
+import tadp.Exito
+import tadp.Fallo
 
 class Tests {
 
@@ -71,54 +74,43 @@ class Tests {
       if (x.get_stats_actuales.fuerza < 20) { x.copy(stats = x.stats.incrementar( Stats(-20, 0, 0, 0))) }
       else { x.copy(stats = x.stats.incrementar( Stats(-10, 0, 0, 0))) }
     },
-    { (x, y) => if (x.lider.trabajo.get.tipo == Guerrero) { Success(20) } else { Success(10) } })
+    { (x, y) => if (x.lider.get.trabajo.get.tipo == Guerrero) { Some(20) } else { Some(10) } })
   
 val pelearMonstruoParaLadrones =  new Tarea(
     { x =>
       if (x.get_stats_actuales.fuerza < 20) { x.copy(stats = x.stats.incrementar( Stats(-20, 0, 0, 0))) }
       else { x.copy(stats = x.stats.incrementar( Stats(-10, 0, 0, 0))) }
     },
-    { (x, y) => if (y.trabajo.get.tipo == Ladron) { Success(20) } else { Success(10) } })
+    { (x, y) => if (y.trabajo.get.tipo == Ladron) { Some(20) } else { Some(10) } })
   
   val tareaExploraBosqueEncantado = new Tarea ({ x => x.copy(stats = x.stats.incrementar( Stats(-10, -10, +20, +30))) },
-      {(x, y) => if (y.getTipoTrabajo == Mago) {Success(y.get_stats_actuales.inteligencia*2)} else {Success(y.get_stats_actuales.velocidad)}})
+      {(x, y) => if (y.getTipoTrabajo == Mago) {Some(y.get_stats_actuales.inteligencia*2)} else {Some(y.get_stats_actuales.velocidad)}})
 
   val tareaExploraPrisionInfernal = new Tarea ({x => x.utilizar_item(Talismanes,unTalisman)},
-      {(x, y)=> if(x.lider.trabajo.get.tipo == Ladron){Success(y.get_stats_actuales().inteligencia)}else{Success(1)}})
+      {(x, y)=> if(x.lider.get.trabajo.get.tipo == Ladron){Some(y.get_stats_actuales().inteligencia)}else{Some(1)}})
   
   val tareaImposible =  new Tarea(
     { x => x.copy(stats = x.stats.incrementar( Stats(-20, -10, -10, -30))) },
     { (x, y) =>
       for {
-        st <- x.lider.get_stat_principal
-        res = 10 if st > 100
+        st <- x.lider.get.get_stat_principal
+        res = 10 if st > 1000
       } yield (res)
     })
 
 
   val misionAntiMonstruo = new Mision(
     List[Tarea](pelearMonstruo),
-    { x =>
-      for{
-        eq <- x
-        resEq = eq.copy(oro = eq.oro * 2)
-    }yield(resEq)})
+    { x => x.copy(oro = x.oro * 2)}
+    )
   
   val misionExploradora = new Mision(
       List(tareaExploraBosqueEncantado, tareaExploraPrisionInfernal),
-      { x =>
-      for{
-        eq <- x
-        resEq <- eq.obtenerItem(unTalismanMaldito)
-    }yield(resEq)})
+      { x => x.obtenerItem(unTalismanMaldito)})
   
   val misionImposible = Mision(
     List[Tarea](tareaImposible),
-    { x =>
-      for{
-        eq <- x
-        resEq = eq.copy(oro = 1000 + (eq.oro * 2))
-    }yield(resEq)})
+    { x => x.copy(oro = 1000 + (x.oro * 2))})
       
   val tabernaPosible = new Taberna()
   tabernaPosible.agregarMision(misionExploradora)
@@ -147,9 +139,9 @@ val pelearMonstruoParaLadrones =  new Tarea(
       val ladronPostPelea =  robinHood.copy(stats = robinHood.stats.incrementar( Stats(-10, 0, 0, 0)))
       println("Stats ladron: " ++ ladronPostPelea.get_stats_actuales().hp.toString)
       println("Stats Equipo: ")
-      res.get.heroes.foreach { x => print(x.get_stats_actuales().hp.toString()++"/") }
+      res.equipo.heroes.foreach { x => print(x.get_stats_actuales().hp.toString()++"/") }
       println
-      assertTrue(res.get.contieneEsteHeroe(ladronPostPelea))
+      assertTrue(res.equipo.contieneEsteHeroe(ladronPostPelea))
   }
   @Test
   def testEquipoContieneUnHeroe() {
@@ -159,39 +151,22 @@ val pelearMonstruoParaLadrones =  new Tarea(
 
   @Test
   def pruebaTareaFallida() {
-    try {
-      tareaImposible.realizarTarea(equipo).get
-      fail("no se produjo la excepcion esperada")
-    } catch {
-      case e: Exception => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)
-    }
+    
+      assertEquals(Fallo, tareaImposible.realizarTarea(equipo))
+    
   }
 
   @Test
   def pruebaMisionExitosa() {
-    var res =for(eq <- misionAntiMonstruo.realizarMision(equipo))yield(eq)
-    assertEquals(200, res.get.oro)
+    var res =for(eq <- misionAntiMonstruo.resultadoMision(equipo))yield(eq)
+    assertEquals(200, res.equipo.oro)
   }
 
   @Test
   def pruebaMisionFallida() {
-    misionImposible.realizarMision(equipo) match{
-      case Success(x) => fail("no se produjo la excepcion esperada")
-      case Failure(e) => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)
-    }
-  }
-  @Test
-  def pruebaMisionFallida3() {
-    misionImposible.realizarMision(equipo) match{
-      case Success(x) => fail("no se produjo la excepcion esperada")
-      case Failure(e) => assertEquals("No hay ningun heroe capaz de realizar la tarea", e.getMessage)
-    }
-  }
-  @Test
-  def pruebaMisionFallida2() {
-     misionImposible.realizarMision(equipoVago) match{
-      case Success(x) => fail("no se produjo la excepcion esperada")
-      case Failure(e) => assertEquals("No tiene trabajo asignado", e.getMessage)
+    misionImposible.resultadoMision(equipo) match{
+      case Exito(x,y) => fail("no se produjo la excepcion esperada")
+      case Fallo(x, y) => assertEquals(tareaImposible, y)
     }
   }
 
