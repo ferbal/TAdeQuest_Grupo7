@@ -4,14 +4,14 @@ import scala.util.Try
 
 class Tarea(consecuencias: Heroe => Heroe, facilidad: (Equipo, Heroe) => Option[Int]) {
 
-  def realizarTarea(equipo: ResultadoTarea): ResultadoTarea = {
-    for {
-      eq <- equipo
-      nuevoeq <- realizarTarea(eq)
-    } yield (nuevoeq)
+  def realizarTarea(equipo: Resultado): Resultado = {
+    equipo match {
+      case Exito(x,_) => realizarTarea(x)
+      case Fallo(x,y) => Fallo(x,y)
+    }
   }
   
-  def realizarTarea(equipo: Equipo): ResultadoTarea = {
+  def realizarTarea(equipo: Equipo): Resultado = {
       equipo.mejorHeroeSegun { x => facilidad(equipo, x) } match {
         case x :: xs => Exito(equipo.reemplazarMiembro(x, consecuencias(x)), this)
         case Nil     => Fallo(equipo, this)
@@ -19,25 +19,25 @@ class Tarea(consecuencias: Heroe => Heroe, facilidad: (Equipo, Heroe) => Option[
   }
 }
 
-trait ResultadoTarea {
+trait Resultado {
   def equipo: Equipo
   def tarea: Tarea
-  def map(f: (Equipo => Equipo)): ResultadoTarea
-  def filter(f: (Equipo => Boolean)): ResultadoTarea
-  def flatMap(f: (Equipo => ResultadoTarea)): ResultadoTarea
+  def map(f: (Equipo => Equipo)): Resultado
+  def filter(f: (Equipo => Boolean)): Resultado
+  def flatMap(f: (Equipo => Resultado)): Resultado
   def fold[T](e: (Equipo => T))(f: (Equipo => T)): T
   }
 
-case class Exito(val equipo:Equipo, val tarea: Tarea) extends ResultadoTarea{
+case class Exito(val equipo:Equipo, val tarea: Tarea) extends Resultado{
   def map(f: (Equipo => Equipo)) =  Exito(f(equipo), tarea)
   def filter(f: (Equipo => Boolean)) = if (f(equipo)) this else Fallo(equipo, tarea)
-  def flatMap(f: (Equipo => ResultadoTarea)) = f(equipo)
+  def flatMap(f: (Equipo => Resultado)) = f(equipo)
   def fold[T](e: (Equipo => T))(f: Equipo => T):T = f(equipo)
 }
 
-case class Fallo(val equipo:Equipo, val tarea: Tarea) extends ResultadoTarea{
+case class Fallo(val equipo:Equipo, val tarea: Tarea) extends Resultado{
   def map(f: (Equipo => Equipo)) =  this
   def filter(f: (Equipo => Boolean)) = this
-  def flatMap(f: (Equipo => ResultadoTarea)) = this
+  def flatMap(f: (Equipo => Resultado)) = this
   def fold[T](e: (Equipo => T))(f: (Equipo=>T)):T = e(equipo)
 }

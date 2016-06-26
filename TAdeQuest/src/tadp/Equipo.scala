@@ -18,7 +18,7 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
             y1 <- y
           } yield (x1 max y1)
         })
-        heroes.filter { x => f(x) == max }
+        heroes.filter { x => f(x) == max && max != None}
       case Nil => Nil
     }
   }

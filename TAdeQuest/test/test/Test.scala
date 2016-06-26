@@ -12,7 +12,7 @@ import tadp.Stats
 import tadp.Trabajo
 import tadp.Equipo
 import tadp.Tarea
-import tadp.ResultadoTarea
+import tadp.Resultado
 import tadp.Mision
 import tadp.Posicion
 import tadp.Habilidad
@@ -152,7 +152,7 @@ val pelearMonstruoParaLadrones =  new Tarea(
   @Test
   def pruebaTareaFallida() {
     
-      assertEquals(Fallo, tareaImposible.realizarTarea(equipo))
+      assertEquals(Fallo(equipo, tareaImposible), tareaImposible.realizarTarea(equipo))
     
   }
 

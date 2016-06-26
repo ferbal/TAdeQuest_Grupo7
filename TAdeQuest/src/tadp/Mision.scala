@@ -15,13 +15,13 @@ case class Mision(tareas: List[Tarea] = List[Tarea](), recompensa: Equipo => Equ
 //    } yield (nuevoeq)
 //  }
   
-  def realizarMision(equipo: Equipo): ResultadoTarea = {
-
-    tareas.foldLeft(Exito(equipo, tareas.head):ResultadoTarea) { (x, y) => y.realizarTarea(x) }
+  def realizarMision(equipo: Equipo): Resultado = {
+    val semilla=tareas.head.realizarTarea(equipo)
+    tareas.tail.foldLeft(semilla) { (x, y) => y.realizarTarea(x) }
 
   }
   
-  def resultadoMision(equipo: Equipo): ResultadoTarea ={
+  def resultadoMision(equipo: Equipo): Resultado ={
     realizarMision(equipo) match{
       case Exito(x, y) => Exito(recompensa(x), y)
       case Fallo(x, y) => Fallo(x,y)
