@@ -158,13 +158,13 @@ val pelearMonstruoParaLadrones =  new Tarea(
 
   @Test
   def pruebaMisionExitosa() {
-    var res =for(eq <- misionAntiMonstruo.resultadoMision(equipo))yield(eq)
+    var res =for(eq <- misionAntiMonstruo.realizarMision(equipo))yield(eq)
     assertEquals(200, res.equipo.oro)
   }
 
   @Test
   def pruebaMisionFallida() {
-    misionImposible.resultadoMision(equipo) match{
+    misionImposible.realizarMision(equipo) match{
       case Exito(x,y) => fail("no se produjo la excepcion esperada")
       case Fallo(x, y) => assertEquals(tareaImposible, y)
     }
@@ -203,12 +203,9 @@ val pelearMonstruoParaLadrones =  new Tarea(
 
     assertEquals(true, unaVinchaBufaloAgua.puede_usar(unLadron))
 
-    try {
-      unPalitoMagico.puede_usar(unLadron)
-      fail("No se produjo la excepcion esperada")
-    } catch {
-      case e: Exception => assertEquals("No tiene trabajo asignado", e.getMessage)
-    }
+
+    assertEquals(false,  unPalitoMagico.puede_usar(unLadron))
+
 
   }
 

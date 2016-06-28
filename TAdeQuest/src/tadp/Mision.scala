@@ -16,17 +16,14 @@ case class Mision(tareas: List[Tarea] = List[Tarea](), recompensa: Equipo => Equ
 //  }
   
   def realizarMision(equipo: Equipo): Resultado = {
-    val semilla=tareas.head.realizarTarea(equipo)
-    tareas.tail.foldLeft(semilla) { (x, y) => y.realizarTarea(x) }
-
-  }
-  
-  def resultadoMision(equipo: Equipo): Resultado ={
-    realizarMision(equipo) match{
-      case Exito(x, y) => Exito(recompensa(x), y)
-      case Fallo(x, y) => Fallo(x,y)
+    
+    tareas match{
+      case x::xs => val semilla=x.realizarTarea(equipo)
+      xs.foldLeft(semilla) { (x, y) => y.realizarTarea(x) }.map{x => recompensa(x)}
+      case Nil => Exito(recompensa(equipo), ???)
     }
   }
+
   
 //  def realizarMision(equipo: Equipo): ResultadoTarea = {
 //    tareas.foldLeft(Exito(equipo)){(x,y) => for(x1 <- x)yield(y.realizarTarea(x1))}

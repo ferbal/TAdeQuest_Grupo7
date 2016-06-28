@@ -34,7 +34,7 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
     val st = get_stats_actuales()
     trabajo match {      
       case None => None
-      case unTrabajo => unTrabajo.get.stat_principal match{
+      case Some(unTrabajo) => unTrabajo.stat_principal match{
                         case Fuerza => Some(st.fuerza)
                         case Inteligencia => Some(st.inteligencia)
                         case Velocidad => Some(st.velocidad)
@@ -45,12 +45,13 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
   }
   
   def aplicarFuncionStatPrincipal(unHeroe : Heroe,funcion : (Int => Int)):Stats = {    
-    this.getTipoStatPrincipal() match {
-      case Fuerza => new Stats(funcion(this.stats.fuerza) ,funcion(this.stats.fuerza),funcion(this.stats.fuerza),funcion(this.stats.fuerza))
-      case Hp => new Stats(funcion(this.stats.hp),funcion(this.stats.hp),funcion(this.stats.hp),funcion(this.stats.hp))
-      case Inteligencia => new Stats(funcion(this.stats.inteligencia),funcion(this.stats.inteligencia),funcion(this.stats.inteligencia),funcion(this.stats.inteligencia))
-      case Velocidad => new Stats(funcion(this.stats.velocidad),funcion(this.stats.velocidad),funcion(this.stats.velocidad),funcion(this.stats.velocidad))
-      case _ => new Stats(0,0,0,0)
+    this.getTipoStatPrincipal match {
+      case Some(Fuerza) => new Stats(funcion(this.stats.fuerza) ,funcion(this.stats.fuerza),funcion(this.stats.fuerza),funcion(this.stats.fuerza))
+      case Some(Hp) => new Stats(funcion(this.stats.hp),funcion(this.stats.hp),funcion(this.stats.hp),funcion(this.stats.hp))
+      case Some(Inteligencia) => new Stats(funcion(this.stats.inteligencia),funcion(this.stats.inteligencia),funcion(this.stats.inteligencia),funcion(this.stats.inteligencia))
+      case Some(Velocidad) => new Stats(funcion(this.stats.velocidad),funcion(this.stats.velocidad),funcion(this.stats.velocidad),funcion(this.stats.velocidad))
+      case Some(_) => new Stats(0,0,0,0)
+      case None => new Stats(0,0,0,0)
     }
   }
   
@@ -74,7 +75,7 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
   }
   
   def cantidadItemsEquipados () : Int = {
-    inventario.count{ x => true } + talismanes.count { x => true }
+    inventario.size + talismanes.size
   }
   
   def validar_ubicacion (ubicacion_actual : Posicion , item_nuevo : Item) : Boolean = {
@@ -96,17 +97,17 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
     }
   }
   
-  def getTipoTrabajo (): Habilidad = { 
+  def getTipoTrabajo (): Option[Habilidad] = { 
     trabajo match {
-      case None => throw new Exception("No tiene trabajo asignado")
-      case unTrabajo => unTrabajo.get.tipo
+      case None => None
+      case Some(unTrabajo) => Some(unTrabajo.tipo)
     }    
   }
   
-    def getTipoStatPrincipal () : StatPrincipal = { //TODO 
+    def getTipoStatPrincipal () : Option[StatPrincipal] = { //TODO 
     trabajo match {
-      case None => throw new Exception("No tiene trabajo asignado")
-      case unTrabajo => unTrabajo.get.stat_principal
+      case None => None
+      case Some(unTrabajo) => Some(unTrabajo.stat_principal)
     }   
   }
 }

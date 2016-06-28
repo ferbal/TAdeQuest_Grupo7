@@ -5,10 +5,7 @@ import scala.util.Try
 class Tarea(consecuencias: Heroe => Heroe, facilidad: (Equipo, Heroe) => Option[Int]) {
 
   def realizarTarea(equipo: Resultado): Resultado = {
-    equipo match {
-      case Exito(x,_) => realizarTarea(x)
-      case Fallo(x,y) => Fallo(x,y)
-    }
+    equipo.flatMap{x => realizarTarea(x)}
   }
   
   def realizarTarea(equipo: Equipo): Resultado = {

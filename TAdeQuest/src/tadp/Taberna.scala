@@ -16,7 +16,7 @@ class Taberna {
 
   def mejorMisionSegunCriterio(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, mision1: Mision, mision2: Mision): Mision = {
 
-    var equiposResultantes = (mision1.resultadoMision(equipo), mision2.resultadoMision(equipo))
+    var equiposResultantes = (mision1.realizarMision(equipo), mision2.realizarMision(equipo))
     equiposResultantes match {
       case (Fallo(_,_), Exito(_,_)) => mision2
       case (Exito(_,_), Fallo(_,_)) => mision1
@@ -46,7 +46,7 @@ class Taberna {
   def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Equipo = {
     val elegida = elegirMision(equipo, criterio, misionesRestantes)
     val restantes = misionesRestantes.diff(List(elegida))
-    elegida.resultadoMision(equipo) match {
+    elegida.realizarMision(equipo) match {
       case Fallo(_,_) => equipo
       case Exito(x, y) => restantes match {
         case Nil => x
