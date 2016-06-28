@@ -14,46 +14,48 @@ class Taberna {
     misiones = mision :: misiones
   }
 
-  def mejorMisionSegunCriterio(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, mision1: Mision, mision2: Mision): Mision = {
+  def mejorMisionSegunCriterio(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, mision1: Option[Mision], mision2: Option[Mision]): Option[Mision] = {
 
-    var equiposResultantes = (mision1.realizarMision(equipo), mision2.realizarMision(equipo))
+    var equiposResultantes = (mision1.map { _.realizarMision(equipo) }, mision2.map { _.realizarMision(equipo) })
     equiposResultantes match {
-      case (Fallo(_,_), Exito(_,_)) => mision2
-      case (Exito(_,_), Fallo(_,_)) => mision1
-      case (Fallo(_,_), Fallo(_,_)) => throw new TodasLasMisionesFallaronException()
-      case (Exito(eq1,_), Exito(eq2,_)) =>
+      case (Some(Exito(eq1)), Some(Exito(eq2))) =>
         criterio(eq1, eq2) match {
           case true  => mision1
           case false => mision2
         }
+      case (_, Some(Exito(_))) => mision2
+      case (Some(Exito(_)), _) => mision1
+      case (_, _)              => None
     }
 
   }
 
-  def elegirMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Mision = {
-
-    misionesRestantes.reduceLeft({ (x, y) => mejorMisionSegunCriterio(equipo, criterio, x, y) })
+  def elegirMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Option[Mision] = {
+    val x: List[Option[Mision]] = misionesRestantes.map { Some(_) }
+    x.reduceLeft({ (x, y) => mejorMisionSegunCriterio(equipo, criterio, x, y) })
   }
 
-  def elegirMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Mision = {
+  def elegirMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Option[Mision] = {
     elegirMision(equipo, criterio, misiones)
   }
 
-  def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Equipo = {
+  def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Resultado = {
     entrenar(equipo, criterio, misiones)
   }
 
-  def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Equipo = {
+  def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Resultado = {
     val elegida = elegirMision(equipo, criterio, misionesRestantes)
-    val restantes = misionesRestantes.diff(List(elegida))
-    elegida.realizarMision(equipo) match {
-      case Fallo(_,_) => equipo
-      case Exito(x, y) => restantes match {
-        case Nil => x
-        case list  => entrenar(x, criterio, list)
+    elegida match {
+      case None => Fallo(equipo, ???)
+      case Some(x) => val restantes = misionesRestantes.diff(List(x))
+      x.realizarMision(equipo) match {
+        case Fallo(_, y) => Fallo(equipo, y)
+        case Exito(x) => restantes match {
+          case Nil  => Exito(x)
+          case list => entrenar(x, criterio, list)
+        }
       }
     }
-
   }
 
 }

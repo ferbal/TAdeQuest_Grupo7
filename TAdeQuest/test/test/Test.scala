@@ -165,7 +165,7 @@ val pelearMonstruoParaLadrones =  new Tarea(
   @Test
   def pruebaMisionFallida() {
     misionImposible.realizarMision(equipo) match{
-      case Exito(x,y) => fail("no se produjo la excepcion esperada")
+      case Exito(x) => fail("no se produjo la excepcion esperada")
       case Fallo(x, y) => assertEquals(tareaImposible, y)
     }
   }
@@ -250,26 +250,26 @@ val pelearMonstruoParaLadrones =  new Tarea(
   @Test
   def pruebaEligeEntreMisiones{
     //La mision exploradora vende el item (100+20), mientras que la otra duplica su oro(200)
-    assertEquals(misionAntiMonstruo, tabernaPosible.elegirMision(equipo, {(x,y)=> println("Oro despues de mision: "++ x.oro.toString)
+    assertEquals(Some(misionAntiMonstruo), tabernaPosible.elegirMision(equipo, {(x,y)=> println("Oro despues de mision: "++ x.oro.toString)
       x.oro > y.oro}))
   }
   
   @Test
   def pruebaEligeMisionPosibleAnteUnaPosibleYUnaImposible{
     //no importa la condicion, siempre se elige la mision que puede ser completada
-    assertEquals(misionExploradora, tabernaImposible.elegirMision(equipo, {(x,y)=> x.oro < y.oro}))
-    assertEquals(misionExploradora, tabernaImposible.elegirMision(equipo, {(x,y)=> x.oro > y.oro}))
+    assertEquals(Some(misionExploradora), tabernaImposible.elegirMision(equipo, {(x,y)=> x.oro < y.oro}))
+    assertEquals(Some(misionExploradora), tabernaImposible.elegirMision(equipo, {(x,y)=> x.oro > y.oro}))
   }
   
   @Test 
   def pruebaEntrenar{
-    assertEquals(220, tabernaPosible.entrenar(equipo, {(x,y)=> x.oro > y.oro}).oro)
-    assertEquals(240, tabernaPosible.entrenar(equipo, {(x,y)=> x.oro < y.oro}).oro)
+    assertEquals(220, tabernaPosible.entrenar(equipo, {(x,y)=> x.oro > y.oro}).equipo.oro)
+    assertEquals(240, tabernaPosible.entrenar(equipo, {(x,y)=> x.oro < y.oro}).equipo.oro)
   }
   
   @Test
   def pruebaEntrenarHastaFallar{
-    assertEquals(120, tabernaImposible.entrenar(equipo, {(x,y)=> x.oro > y.oro}).oro)
+    assertEquals(120, tabernaImposible.entrenar(equipo, {(x,y)=> x.oro > y.oro}).equipo.oro)
   }
 
 }

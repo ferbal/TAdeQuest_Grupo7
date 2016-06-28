@@ -10,7 +10,7 @@ class Tarea(consecuencias: Heroe => Heroe, facilidad: (Equipo, Heroe) => Option[
   
   def realizarTarea(equipo: Equipo): Resultado = {
       equipo.mejorHeroeSegun { x => facilidad(equipo, x) } match {
-        case x :: xs => Exito(equipo.reemplazarMiembro(x, consecuencias(x)), this)
+        case x :: xs => Exito(equipo.reemplazarMiembro(x, consecuencias(x)))
         case Nil     => Fallo(equipo, this)
       }
   }
@@ -25,9 +25,10 @@ trait Resultado {
   def fold[T](e: (Equipo => T))(f: (Equipo => T)): T
   }
 
-case class Exito(val equipo:Equipo, val tarea: Tarea) extends Resultado{
-  def map(f: (Equipo => Equipo)) =  Exito(f(equipo), tarea)
-  def filter(f: (Equipo => Boolean)) = if (f(equipo)) this else Fallo(equipo, tarea)
+case class Exito(val equipo:Equipo) extends Resultado{
+  def tarea: Tarea = ???
+  def map(f: (Equipo => Equipo)) =  Exito(f(equipo))
+  def filter(f: (Equipo => Boolean)) = if (f(equipo)) this else Fallo(equipo, ???)
   def flatMap(f: (Equipo => Resultado)) = f(equipo)
   def fold[T](e: (Equipo => T))(f: Equipo => T):T = f(equipo)
 }
