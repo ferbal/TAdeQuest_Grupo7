@@ -7,22 +7,22 @@ import scala.util.Failure
 
 case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: String = "Equipo") {
 
-  def mejorHeroeSegun(f: Heroe => Option[Int]): List[Heroe] = {
+  def mejorHeroeSegun(f: Heroe => Option[Int]): Option[Heroe] = {
     heroes match {
-      case x :: Nil => x :: Nil
+      case x :: Nil => Some(x) 
       case x :: xs =>
-        val results = heroes.map { x => f(x) }
-        val max = results.reduceLeft({ (x, y) =>
-          for {
-            x1 <- x
-            y1 <- y
-          } yield (x1 max y1)
-        })
-        heroes.filter { x => f(x) == max && max != None}
-      case Nil => Nil
+        //val results = heroes.map(x=>f(x))
+        val results = for ( unHeroe <- heroes
+            )yield Tuple2(unHeroe,f(unHeroe))
+        val max = results.filter(!_._2.isEmpty).sortWith( _._2.getOrElse(0) > _._2.getOrElse(0))
+        if (max.isEmpty)
+          None
+        else
+          Some(results.filter(!_._2.isEmpty).sortWith( _._2.getOrElse(0) > _._2.getOrElse(0)).head._1)        
+      case Nil => None      
     }
   }
-
+  
   def obtenerItem(item: Item): Equipo = {
       mejorHeroeSegun({ x =>
         var statnuevo = x.utilizar_item(item.ubicacion, item).get_stat_principal
@@ -32,8 +32,8 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
           res = (stn - st) if (stn-st > 0)
         } yield { res }
       }) match {
-        case Nil => this.copy( oro = this.oro + 20)
-        case x :: xs => { reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item)) }
+        case None => this.copy( oro = this.oro + 20)
+        case Some(x) => { reemplazarMiembro(x, x.utilizar_item(item.ubicacion, item)) }
       }
   }
 
@@ -54,11 +54,12 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
   def lider: Option[Heroe] = {
     mejorHeroeSegun({ x => for (st <- x.get_stat_principal) yield (st)
 
-    }) match {
-      case x :: Nil => Some(x)
-      case x :: xs  => None
-      case Nil      => None
-    }
+    }) 
+//    match {
+//      case x :: Nil => Some(x)
+//      case x :: xs  => None
+//      case Nil      => None
+//    }
   }
  
 }

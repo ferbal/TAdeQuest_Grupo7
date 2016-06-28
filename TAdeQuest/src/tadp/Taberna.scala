@@ -18,10 +18,10 @@ class Taberna {
 
     var equiposResultantes = (mision1.resultadoMision(equipo), mision2.resultadoMision(equipo))
     equiposResultantes match {
-      case (Fallo(_,_), Exito(_,_)) => mision2
-      case (Exito(_,_), Fallo(_,_)) => mision1
+      case (Fallo(_,_), Exito(_)) => mision2
+      case (Exito(_), Fallo(_,_)) => mision1
       case (Fallo(_,_), Fallo(_,_)) => throw new TodasLasMisionesFallaronException()
-      case (Exito(eq1,_), Exito(eq2,_)) =>
+      case (Exito(eq1), Exito(eq2)) =>
         criterio(eq1, eq2) match {
           case true  => mision1
           case false => mision2
@@ -48,7 +48,7 @@ class Taberna {
     val restantes = misionesRestantes.diff(List(elegida))
     elegida.resultadoMision(equipo) match {
       case Fallo(_,_) => equipo
-      case Exito(x, y) => restantes match {
+      case Exito(x) => restantes match {
         case Nil => x
         case list  => entrenar(x, criterio, list)
       }

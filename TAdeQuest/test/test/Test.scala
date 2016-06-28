@@ -165,7 +165,7 @@ val pelearMonstruoParaLadrones =  new Tarea(
   @Test
   def pruebaMisionFallida() {
     misionImposible.resultadoMision(equipo) match{
-      case Exito(x,y) => fail("no se produjo la excepcion esperada")
+      case Exito(x) => fail("no se produjo la excepcion esperada")
       case Fallo(x, y) => assertEquals(tareaImposible, y)
     }
   }

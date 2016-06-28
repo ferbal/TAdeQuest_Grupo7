@@ -57,18 +57,18 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
       //Filtro inventario: me quedo con todos los items menos el que voy a usar
       ubicacion match{
         
-      case Talismanes => {
-        var talismanesMutables = talismanes
-        talismanesMutables = item :: talismanes
-        copy(talismanes = talismanesMutables)}
-        
-      case _ => {
-        var invMutable = inventario 
-        invMutable = for {
-                          (u,i) <- inventario if !validar_ubicacion(u, item)    
-                        } yield (u,i)
-        invMutable.update(ubicacion, item)
-        copy(inventario = invMutable)}
+          case Talismanes => {
+            var talismanesMutables = talismanes
+            talismanesMutables = item :: talismanes
+            copy(talismanes = talismanesMutables)}
+            
+          case _ => {
+            var invMutable = inventario 
+            invMutable = for {
+                              (u,i) <- inventario if !validar_ubicacion(u, item)    
+                            } yield (u,i)
+            invMutable.update(ubicacion, item)
+            copy(inventario = invMutable)}
       }
     }
     else{
