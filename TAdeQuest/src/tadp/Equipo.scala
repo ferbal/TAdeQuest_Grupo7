@@ -15,7 +15,7 @@ case class Equipo(heroes: List[Heroe] = List[Heroe](), oro: Int = 0, nombre: Str
         val results = for ( unHeroe <- heroes
             )yield Tuple2(unHeroe,f(unHeroe))
         val max = results.filter(!_._2.isEmpty).sortWith( _._2.getOrElse(0) > _._2.getOrElse(0))
-        if (max.isEmpty)
+        if (max.isEmpty || results.filter(_._1 == max).size > 1)
           None
         else
           Some(results.filter(!_._2.isEmpty).sortWith( _._2.getOrElse(0) > _._2.getOrElse(0)).head._1)        
