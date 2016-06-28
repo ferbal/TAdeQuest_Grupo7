@@ -20,11 +20,9 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
   
   def get_stats_actuales():Stats = {    
     var st : Stats = stats //this.stats
-
-    if (trabajo != None)
-      st= trabajo.get.aplicarModificadorDeStats(st,this)  
-    
     val itemsTotales = inventario.values ++ talismanes
+    
+    st = trabajo.fold(st){_.aplicarModificadorDeStats(st, this)}
     
     itemsTotales.foldLeft(st) {(stats, item) => item.beneficios(stats, this)}
 
@@ -56,22 +54,27 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
   }
   
   def utilizar_item (ubicacion: Posicion,item : Item): Heroe = {
-    //Filtro inventario: me quedo con todos los items menos el que voy a usar
-    ubicacion match{
-      
-    case Talismanes => {
-      var talismanesMutables = talismanes
-      talismanesMutables = item :: talismanes
-      copy(talismanes = talismanesMutables)}
-      
-    case _ => {
-      var invMutable = inventario 
-      invMutable = for {
-                        (u,i) <- inventario if !validar_ubicacion(u, item)    
-                      } yield (u,i)
-      invMutable.update(ubicacion, item)
-      copy(inventario = invMutable)}
-    }  
+    if (item.puede_usar(this)){
+      //Filtro inventario: me quedo con todos los items menos el que voy a usar
+      ubicacion match{
+        
+          case Talismanes => {
+            var talismanesMutables = talismanes
+            talismanesMutables = item :: talismanes
+            copy(talismanes = talismanesMutables)}
+            
+          case _ => {
+            var invMutable = inventario 
+            invMutable = for {
+                              (u,i) <- inventario if !validar_ubicacion(u, item)    
+                            } yield (u,i)
+            invMutable.update(ubicacion, item)
+            copy(inventario = invMutable)}
+      }
+    }
+    else{
+      this
+    }
   }
   
   def cantidadItemsEquipados () : Int = {
@@ -87,6 +90,23 @@ case class Heroe (stats: Stats = Stats(100,20,45,5),
       }
     }
 
+    def estaOcupado(ubicacion :Posicion) : Boolean ={
+    ubicacion match {
+      case AmbasManos => inventario.contains(AmbasManos) || inventario.contains(ManoDer) || inventario.contains(ManoIzq) 
+      case ManoDer => inventario.contains(AmbasManos) || inventario.contains(ManoDer) 
+      case ManoIzq => inventario.contains(AmbasManos) || inventario.contains(ManoIzq)
+      case UnaMano => inventario.contains(AmbasManos) || inventario.contains(ManoDer) && inventario.contains(ManoIzq)      
+      case otra => inventario.contains(otra)
+      }
+    //inventario.contains(ubicacion)
+    }
+  
+    def manoLibre(ubicacion : Posicion) : Posicion = {
+      ubicacion match {
+        case UnaMano => if (!estaOcupado(ManoDer)){ManoDer} else if (estaOcupado(ManoIzq)){ManoDer} else {AmbasManos}
+        case otraCosa => otraCosa 
+      }
+    }
  
   def verificoUbicacionActualDeMano (ubicacion_actual : Posicion) : Boolean = {
     ubicacion_actual match {

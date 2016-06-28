@@ -46,7 +46,7 @@ class Taberna {
   def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean, misionesRestantes: List[Mision]): Resultado = {
     val elegida = elegirMision(equipo, criterio, misionesRestantes)
     elegida match {
-      case None => Fallo(equipo, ???)
+      case None => Error(equipo, "No se encontro mision posible de realizar en la taberna")
       case Some(x) => val restantes = misionesRestantes.diff(List(x))
       x.realizarMision(equipo) match {
         case Fallo(_, y) => Fallo(equipo, y)
@@ -54,6 +54,7 @@ class Taberna {
           case Nil  => Exito(x)
           case list => entrenar(x, criterio, list)
         }
+
       }
     }
   }

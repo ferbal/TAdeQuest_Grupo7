@@ -5,6 +5,7 @@ trait Posicion
 case object Cabeza extends Posicion
 case object ManoIzq extends Posicion
 case object ManoDer extends Posicion
+case object UnaMano extends Posicion
 case object AmbasManos extends Posicion
 case object Torso extends Posicion
 case object Talismanes extends Posicion
